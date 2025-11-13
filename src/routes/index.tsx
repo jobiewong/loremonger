@@ -1,7 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { invoke } from "@tauri-apps/api/core";
-import { useState } from "react";
-import reactLogo from "~/assets/react.svg";
+import { IconArrowOutOfBox, IconScript } from "central-icons";
+import { useTheme } from "next-themes";
+import { useCallback, useState } from "react";
+import { toast } from "sonner";
+import { Button } from "~/components/ui/button";
+import {
+  FileUpload,
+  FileUploadDropzone,
+  FileUploadItem,
+  FileUploadItemDelete,
+  FileUploadItemMetadata,
+  FileUploadItemPreview,
+  FileUploadList,
+  FileUploadTrigger,
+} from "~/components/ui/file-upload";
 import "~/styles/globals.css";
 
 export const Route = createFileRoute("/")({
@@ -9,46 +21,59 @@ export const Route = createFileRoute("/")({
 });
 
 function RouteComponent() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+  const { setTheme } = useTheme();
+  const [files, setFiles] = useState<File[]>([]);
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
-  }
+  const onFileReject = useCallback((file: File, message: string) => {
+    toast(message, {
+      description: `"${file.name.length > 20 ? `${file.name.slice(0, 20)}...` : file.name}" has been rejected`,
+    });
+  }, []);
 
   return (
-    <main className="container">
-      <h1 className="text-2xl font-bold">Welcome to Tauri + React</h1>
-
-      <div className="row">
-        <a href="https://vite.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <main className="container flex flex-col items-center justify-center">
+      <div className="flex flex-col gap-4 w-full max-w-lg lg:max-w-2xl">
+        <FileUpload
+          value={files}
+          onValueChange={setFiles}
+          onFileReject={onFileReject}
+          multiple
+        >
+          <FileUploadDropzone>
+            <div className="flex flex-col items-center gap-1 text-center">
+              <div className="flex items-center justify-center rounded-full border p-2.5">
+                <IconArrowOutOfBox className="text-accent-600" />
+              </div>
+              <p className="font-medium text-sm">
+                Drag & drop audio files here
+              </p>
+              <p className="text-muted-foreground text-xs">
+                Or click to browse (.mp3, .wav, .m4a)
+              </p>
+            </div>
+            <FileUploadTrigger className="border text-sm px-3 py-1 mt-3 font-semibold hover:bg-accent">
+              Browse Files
+            </FileUploadTrigger>
+          </FileUploadDropzone>
+          <FileUploadList>
+            {files.map((file, index) => (
+              <FileUploadItem key={index} value={file}>
+                <FileUploadItemPreview />
+                <FileUploadItemMetadata />
+                <FileUploadItemDelete asChild>
+                  <Button variant="ghost" size="icon" className="size-7">
+                    X
+                  </Button>
+                </FileUploadItemDelete>
+              </FileUploadItem>
+            ))}
+          </FileUploadList>
+        </FileUpload>
+        <Button onClick={() => setTheme("dark")}>
+          <IconScript />
+          Transcribe
+        </Button>
       </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
     </main>
   );
 }
