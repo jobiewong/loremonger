@@ -90,7 +90,7 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
-  --radius: 0.625rem;
+  --radius: 0rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -107,7 +107,8 @@
   --accent-foreground: var(--color-accent-600);
   --accent-border: var(--color-accent-200);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
+  --border: oklch(0 0 0);
+  --border-muted: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
   --chart-1: oklch(0.646 0.222 41.116);
@@ -149,13 +150,14 @@
   --primary-foreground: oklch(0.205 0 0);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
+  --muted: oklch(0.225 0 0);
   --muted-foreground: oklch(0.708 0 0);
   --accent: var(--color-accent-100);
   --accent-foreground: var(--color-accent-700);
   --accent-border: var(--color-accent-700);
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
+  --border: oklch(1 0 0);
+  --border-muted: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
   --chart-1: oklch(0.488 0.243 264.376);
@@ -207,6 +209,7 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-border: var(--border);
+  --color-border-muted: var(--border-muted);
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-chart-1: var(--chart-1);
@@ -258,10 +261,10 @@
 }
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border-muted outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
   }
 }
 
@@ -270,7 +273,11 @@
     @apply border border-red-500;
   }
 
-  .container {
-    @apply min-h-[calc(100vh-var(--header-height))];
+  .page-wrapper {
+    @apply min-h-[calc(100vh-var(--header-height))] size-full;
+  }
+
+  .offset-border {
+    @apply w-[calc(100%+2px)] -translate-x-px;
   }
 }
