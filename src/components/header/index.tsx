@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import packageJson from "~/../package.json";
 
 const links = ["File", "Edit", "View", "Help"];
@@ -8,12 +9,13 @@ export function Header() {
       <div>
         <div className="flex items-center gap-1 -ml-2">
           {links.map((link) => (
-            <button
+            <Link
               key={link}
+              to="/settings"
               className="text-sm font-medium hover:bg-muted px-2 py-0.5 cursor-pointer"
             >
               {link}
-            </button>
+            </Link>
           ))}
         </div>
       </div>

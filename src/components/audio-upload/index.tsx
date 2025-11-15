@@ -13,7 +13,6 @@ import {
   FileUploadList,
   FileUploadTrigger,
 } from "~/components/ui/file-upload";
-import { test } from "~/lib/audio";
 
 export function AudioUpload() {
   const [files, setFiles] = useState<File[]>([]);
@@ -26,8 +25,8 @@ export function AudioUpload() {
 
   async function onSubmit() {
     try {
-      const text = await test("What is love?", "gpt-3.5-turbo");
-      toast.success(text);
+      // const text = await test("What is love?", "gpt-3.5-turbo");
+      // toast.success(text);
     } catch (error) {
       toast.error("Error getting chat completion", {
         description: error instanceof Error ? error.message : "Unknown error",
