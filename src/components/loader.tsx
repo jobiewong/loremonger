@@ -1,9 +1,10 @@
 import { IconLoader } from "central-icons";
 import { cn } from "~/lib/utils";
-export function Loader({ ...props }: React.HTMLAttributes<HTMLSpanElement>) {
+export function Loader({ ...props }: React.SVGProps<SVGSVGElement>) {
   return (
-    <span className={cn("animate-spin", props.className)} {...props}>
-      <IconLoader />
-    </span>
+    <IconLoader
+      className={cn("size-4 animate-spin", props.className)}
+      {...props}
+    />
   );
 }

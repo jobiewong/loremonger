@@ -20,7 +20,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
         info: <IconSquareInfo className="size-4 text-blue-400" />,
         warning: <IconTriangleExclamation className="size-4 text-yellow-400" />,
         error: <IconCircleX className="size-4 text-red-500" />,
-        loading: <Loader className="size-4" />,
+        loading: <Loader />,
       }}
       style={
         {

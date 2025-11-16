@@ -7,10 +7,14 @@ export const initStronghold = async () => {
   const stronghold = await Stronghold.load(vaultPath, vaultPassword);
 
   let client: Client;
-  const clientName = "name your client";
+  const clientName = "loremonger-app";
+
+  console.log("loading client...");
   try {
     client = await stronghold.loadClient(clientName);
+    console.log("client loaded");
   } catch {
+    console.log("client not found, creating...");
     client = await stronghold.createClient(clientName);
   }
 

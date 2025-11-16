@@ -1,17 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AudioUpload } from "~/components/audio-upload";
-import "~/styles/globals.css";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/help")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
   return (
     <main className="page-wrapper flex flex-col items-center">
-      <div className="content-wrapper">
-        <AudioUpload />
-      </div>
+      <div className="content-wrapper">Help Page!</div>
     </main>
   );
 }

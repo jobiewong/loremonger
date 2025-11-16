@@ -1,5 +1,4 @@
 import { createRootRoute, Outlet } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { ThemeProvider } from "next-themes";
 import { AppBackground } from "~/components/app-background";
 import { Header } from "~/components/header";

@@ -1,4 +1,4 @@
-import { IconArrowOutOfBox, IconCrossSmall, IconScript } from "central-icons";
+import { IconArrowOutOfBox, IconCrossSmall } from "central-icons";
 import { motion } from "motion/react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
@@ -84,7 +84,7 @@ export function AudioUpload() {
         </FileUpload>
       </motion.div>
       <Button onClick={onSubmit} disabled={files.length === 0}>
-        <IconScript />
+        {/* <IconScript /> */}
         Transcribe
       </Button>
     </div>
