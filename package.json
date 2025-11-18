@@ -24,6 +24,8 @@
     "@tanstack/react-router": "^1.136.0",
     "@tanstack/react-router-devtools": "^1.136.0",
     "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-dialog": "^2.4.2",
+    "@tauri-apps/plugin-fs": "^2.4.4",
     "@tauri-apps/plugin-opener": "^2",
     "@tauri-apps/plugin-stronghold": "^2.3.1",
     "ai": "^5.0.93",

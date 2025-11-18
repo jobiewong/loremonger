@@ -3,7 +3,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { getChatCompletion } from "~/lib/openai-utils";
+import { saveFileWithPrompt } from "~/lib/utils";
 
 export const Route = createFileRoute("/workbench")({
   component: RouteComponent,
@@ -12,20 +12,8 @@ export const Route = createFileRoute("/workbench")({
 function RouteComponent() {
   const [input, setInput] = useState("");
   async function handleSubmit() {
-    try {
-      const completion = await getChatCompletion([
-        {
-          role: "user",
-          content: input,
-        },
-      ]);
-      console.log("🚀 ~ handleSubmit ~ completion:", completion);
-    } catch (error) {
-      console.error("🚀 ~ handleSubmit ~ error:", error);
-      toast.error("Error getting chat completion", {
-        description: error instanceof Error ? error.message : "Unknown error",
-      });
-    }
+    const markdown = `# ${input}`;
+    await saveFileWithPrompt(new File([markdown], "notes.md"));
   }
 
   return (

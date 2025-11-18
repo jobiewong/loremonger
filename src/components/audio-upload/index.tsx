@@ -6,13 +6,14 @@ import {
 } from "central-icons";
 import { useAtom, useSetAtom } from "jotai";
 import { AnimatePresence, motion } from "motion/react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
-import { statusAtom } from "~/components/audio-upload/atoms";
+import {
+  processingFileAtom,
+  statusAtom,
+  transcriptStatsAtom,
+} from "~/components/audio-upload/atoms";
 import { ProgressIndicator } from "~/components/audio-upload/progress-indicator";
-import { Loader } from "~/components/loader";
-import { Stopwatch } from "~/components/stopwatch";
-import { TimeAgo } from "~/components/time-ago";
 import { Button } from "~/components/ui/button";
 import {
   FileUpload,
@@ -25,12 +26,20 @@ import {
   FileUploadTrigger,
 } from "~/components/ui/file-upload";
 import { transcribeAudio } from "~/lib/el-labs-utils";
+import { generateNotes } from "~/lib/openai-utils";
+import {
+  getGpt5NanoCost,
+  getTimestampString,
+  getTokenCount,
+  saveFileWithPrompt,
+} from "~/lib/utils";
 
 export function AudioUpload() {
   const [files, setFiles] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useAtom(statusAtom);
-  const [step, setStep] = useState(0);
+  const setProcessingFile = useSetAtom(processingFileAtom);
+  const setTranscriptStats = useSetAtom(transcriptStatsAtom);
 
   const onFileReject = useCallback((_file: File, message: string) => {
     toast.error(message, {
@@ -43,15 +52,39 @@ export function AudioUpload() {
     try {
       for (const file of files) {
         setStatus((prev) => ({ ...prev, transcribe: "loading" }));
-        const transcription = await transcribeAudio(file);
+        setProcessingFile(file.name);
+        const transcription = await transcribeAudio(file, (error) => {
+          setStatus((prev) => ({ ...prev, transcribe: "error" }));
+          setProcessingFile(error.message);
+          throw error;
+        });
         setStatus((prev) => ({ ...prev, transcribe: "success" }));
-        console.log("🚀 ~ onSubmit ~ transcription:", transcription);
+        if (transcription) {
+          setStatus((prev) => ({ ...prev, generateNotes: "loading" }));
+          const tokens = getTokenCount("gpt-5-nano", transcription.text);
+          const wordCount = transcription.text.split(" ").length;
+          const cost = getGpt5NanoCost(tokens);
+          setTranscriptStats({ tokens, wordCount, cost });
+          const notes = await generateNotes(transcription.text, [], true);
+          if (notes) {
+            setStatus((prev) => ({
+              ...prev,
+              generateNotes: "success",
+              cleanUp: "loading",
+            }));
+            const timestamp = getTimestampString();
+            await saveFileWithPrompt(
+              new File([notes], `${timestamp} - notes.md`)
+            );
+            setStatus((prev) => ({ ...prev, cleanUp: "success" }));
+          } else {
+            setStatus((prev) => ({ ...prev, generateNotes: "error" }));
+          }
+        }
       }
     } catch (error) {
-      setStatus((prev) => ({ ...prev, transcribe: "error" }));
-      toast.error("Error transcribing audio", {
-        description: error instanceof Error ? error.message : "Unknown error",
-      });
+      setIsLoading(false);
+      console.log("🚀 ~ handleTranscribe ~ error:", error);
     }
   }
 
@@ -105,22 +138,25 @@ export function AudioUpload() {
           </FileUploadList>
         </FileUpload>
       </motion.div>
-      <Button
-        onClick={handleTranscribe}
-        disabled={files.length === 0 || isLoading}
-      >
-        <IconScript />
-        Process
-      </Button>
-      <ProgressIndicator />
+      <motion.div layout="position" className="w-full">
+        <Button
+          onClick={handleTranscribe}
+          disabled={files.length === 0 || isLoading}
+          className="w-full"
+        >
+          <IconScript />
+          Transcribe
+        </Button>
+      </motion.div>
+      <ProgressIndicator isLoading={isLoading} />
       <div className="h-[38px] w-full relative">
-        <AnimatePresence>
+        <AnimatePresence mode="popLayout">
           {status.cleanUp === "success" ? (
             <motion.div
               key="done-message"
-              initial={{ opacity: 0, y: -30 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -30 }}
+              initial={{ y: -30 }}
+              animate={{ y: 0 }}
+              exit={{ y: -30 }}
               className="offset-border absolute flex items-center gap-2 justify-center top-0 left-0 border text-center text-sm p-2 border-border"
             >
               <IconCelebrate className="size-4 text-accent-foreground" /> Done

@@ -45,8 +45,10 @@ export function resetOpenAICache() {
   cachedApiKey = null;
 }
 
-export async function transcribeAudio(file: File) {
-  const toastId = toast.loading("Transcribing audio...");
+export async function transcribeAudio(
+  file: File,
+  onError: (error: Error) => void
+) {
   try {
     const elevenlabs = await getElevenlabsClient();
     const transcription = await elevenlabs.speechToText.convert({
@@ -57,14 +59,10 @@ export async function transcribeAudio(file: File) {
       diarize: true,
     });
 
-    toast.success("Transcription complete", { id: toastId });
     return transcription as SpeechToTextChunkResponseModel;
   } catch (error) {
-    console.error("🚀 ~ transcribeAudio ~ error:", error);
-    toast.error("Error transcribing audio", {
-      description: error instanceof Error ? error.message : "Unknown error",
-      id: toastId,
-    });
-    return null;
+    onError(
+      error instanceof Error ? error : new Error("Error transcribing audio")
+    );
   }
 }

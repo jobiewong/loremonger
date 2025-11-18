@@ -1,4 +1,4 @@
-import { atom } from "jotai";
+import { atom, useAtom } from "jotai";
 
 export type Status = "idle" | "loading" | "success" | "error";
 
@@ -13,3 +13,10 @@ export const statusAtom = atom<Progress>({
   generateNotes: "idle",
   cleanUp: "idle",
 });
+
+export const processingFileAtom = atom<string | null>(null);
+export const transcriptStatsAtom = atom<{
+  tokens: number;
+  wordCount: number;
+  cost: number;
+} | null>(null);

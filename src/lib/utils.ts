@@ -1,3 +1,6 @@
+import { documentDir } from "@tauri-apps/api/path";
+import { save } from "@tauri-apps/plugin-dialog";
+import { create } from "@tauri-apps/plugin-fs";
 import { Store } from "@tauri-apps/plugin-stronghold";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -50,4 +53,26 @@ export async function getStrongholdStore() {
     });
   }
   return strongholdStorePromise;
+}
+
+export async function saveFileWithPrompt(file: File) {
+  const documentsDir = await documentDir();
+  const defaultPath = `${documentsDir}/${file.name}`;
+
+  const path = await save({
+    filters: [
+      {
+        name: "Markdown filter",
+        extensions: ["mdx", "md", "txt"],
+      },
+    ],
+    defaultPath,
+  });
+
+  if (path) {
+    const content = new Uint8Array(await file.arrayBuffer());
+    const fileRef = await create(path);
+    await fileRef.write(content);
+    await fileRef.close();
+  }
 }

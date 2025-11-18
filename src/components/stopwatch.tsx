@@ -32,8 +32,7 @@ export function Stopwatch({ isPaused, ...props }: StopwatchProps) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          {" "}
-          {minutes > 0 && `${minutes}m`}
+          {minutes > 0 && `${minutes}m`}{" "}
         </motion.span>
         <motion.span
           key="seconds"
