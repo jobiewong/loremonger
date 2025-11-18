@@ -1,7 +1,18 @@
-import { IconArrowOutOfBox, IconCrossSmall } from "central-icons";
-import { motion } from "motion/react";
-import { useCallback, useState } from "react";
+import {
+  IconArrowOutOfBox,
+  IconCelebrate,
+  IconCrossSmall,
+  IconScript,
+} from "central-icons";
+import { useAtom, useSetAtom } from "jotai";
+import { AnimatePresence, motion } from "motion/react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { statusAtom } from "~/components/audio-upload/atoms";
+import { ProgressIndicator } from "~/components/audio-upload/progress-indicator";
+import { Loader } from "~/components/loader";
+import { Stopwatch } from "~/components/stopwatch";
+import { TimeAgo } from "~/components/time-ago";
 import { Button } from "~/components/ui/button";
 import {
   FileUpload,
@@ -17,6 +28,9 @@ import { transcribeAudio } from "~/lib/el-labs-utils";
 
 export function AudioUpload() {
   const [files, setFiles] = useState<File[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [status, setStatus] = useAtom(statusAtom);
+  const [step, setStep] = useState(0);
 
   const onFileReject = useCallback((_file: File, message: string) => {
     toast.error(message, {
@@ -24,12 +38,18 @@ export function AudioUpload() {
     });
   }, []);
 
-  async function onSubmit() {
+  async function handleTranscribe() {
+    setIsLoading(true);
     try {
-      const transcription = await transcribeAudio(files[0]);
-      console.log("🚀 ~ onSubmit ~ transcription:", transcription);
+      for (const file of files) {
+        setStatus((prev) => ({ ...prev, transcribe: "loading" }));
+        const transcription = await transcribeAudio(file);
+        setStatus((prev) => ({ ...prev, transcribe: "success" }));
+        console.log("🚀 ~ onSubmit ~ transcription:", transcription);
+      }
     } catch (error) {
-      toast.error("Error getting chat completion", {
+      setStatus((prev) => ({ ...prev, transcribe: "error" }));
+      toast.error("Error transcribing audio", {
         description: error instanceof Error ? error.message : "Unknown error",
       });
     }
@@ -42,6 +62,7 @@ export function AudioUpload() {
           value={files}
           onValueChange={setFiles}
           onFileReject={onFileReject}
+          className="gap-0"
           accept="audio/*,video/*"
           multiple
         >
@@ -84,10 +105,29 @@ export function AudioUpload() {
           </FileUploadList>
         </FileUpload>
       </motion.div>
-      <Button onClick={onSubmit} disabled={files.length === 0}>
-        {/* <IconScript /> */}
-        Transcribe
+      <Button
+        onClick={handleTranscribe}
+        disabled={files.length === 0 || isLoading}
+      >
+        <IconScript />
+        Process
       </Button>
+      <ProgressIndicator />
+      <div className="h-[38px] w-full relative">
+        <AnimatePresence>
+          {status.cleanUp === "success" ? (
+            <motion.div
+              key="done-message"
+              initial={{ opacity: 0, y: -30 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -30 }}
+              className="offset-border absolute flex items-center gap-2 justify-center top-0 left-0 border text-center text-sm p-2 border-border"
+            >
+              <IconCelebrate className="size-4 text-accent-foreground" /> Done
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }

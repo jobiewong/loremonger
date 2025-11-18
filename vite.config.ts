@@ -21,6 +21,17 @@ export default defineConfig(async () => ({
   resolve: {
     alias: {
       "~": path.resolve(__dirname, "./src"),
+      buffer: "buffer",
+    },
+  },
+  define: {
+    global: "globalThis",
+  },
+  optimizeDeps: {
+    esbuildOptions: {
+      define: {
+        global: "globalThis",
+      },
     },
   },
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
