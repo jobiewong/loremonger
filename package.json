@@ -12,12 +12,13 @@
   "dependencies": {
     "@ai-sdk/openai": "^2.0.65",
     "@elevenlabs/client": "^0.11.0",
+    "@elevenlabs/elevenlabs-js": "^2.24.1",
     "@elevenlabs/react": "^0.11.0",
     "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-dropdown-menu": "^2.1.15",
     "@radix-ui/react-label": "^2.1.8",
     "@radix-ui/react-popover": "^1.1.15",
     "@radix-ui/react-slot": "^1.2.4",
-    "@radix-ui/react-dropdown-menu": "^2.1.15",
     "@radix-ui/react-tooltip": "^1.2.7",
     "@tailwindcss/vite": "^4.1.17",
     "@tanstack/react-router": "^1.136.0",
@@ -38,7 +39,9 @@
     "react-dom": "^19.1.0",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0",
-    "tailwindcss": "^4.1.17"
+    "tailwindcss": "^4.1.17",
+    "tiktoken": "^1.0.22",
+    "vite-plugin-wasm": "^3.5.0"
   },
   "devDependencies": {
     "@tanstack/router-plugin": "^1.136.0",

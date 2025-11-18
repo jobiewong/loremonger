@@ -1,6 +1,7 @@
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
+import { bootstrapStrongholdFromEnv } from "./scripts/bootstrap-stronghold";
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
@@ -19,6 +20,7 @@ declare module "@tanstack/react-router" {
 const rootElement = document.getElementById("root")!;
 if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
+  bootstrapStrongholdFromEnv();
   root.render(
     <StrictMode>
       <RouterProvider router={router} />

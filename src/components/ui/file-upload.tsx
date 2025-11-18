@@ -2,14 +2,13 @@
 
 import { Slot } from "@radix-ui/react-slot";
 import {
-  FileArchiveIcon,
-  FileAudioIcon,
-  FileCodeIcon,
-  FileCogIcon,
-  FileIcon,
-  FileTextIcon,
-  FileVideoIcon,
-} from "lucide-react";
+  IconAudio,
+  IconFileBend,
+  IconFileText,
+  IconFileZip,
+  IconVideoClip,
+} from "central-icons";
+import { FileCodeIcon, FileCogIcon } from "lucide-react";
 import * as React from "react";
 import { cn } from "~/lib/utils";
 
@@ -817,7 +816,7 @@ function FileUploadDropzone(props: FileUploadDropzoneProps) {
       tabIndex={context.disabled ? undefined : 0}
       {...dropzoneProps}
       className={cn(
-        "relative flex select-none flex-col items-center justify-center gap-2 border border-dashed p-6 outline-none transition-colors hover:bg-accent/30 focus-visible:border-ring/50 data-[disabled]:pointer-events-none data-[dragging]:border-primary/30 data-[invalid]:border-destructive data-[dragging]:bg-accent/30 data-[invalid]:ring-destructive/20",
+        "relative flex select-none flex-col items-center justify-center gap-2 border border-dashed p-6 outline-none transition-colors hover:bg-accent/30 focus-visible:border-ring/50 data-disabled:pointer-events-none data-dragging:border-primary/30 data-invalid:border-destructive data-dragging:bg-accent/30 data-invalid:ring-destructive/20",
         className
       )}
       onClick={onClick}
@@ -1013,18 +1012,18 @@ function getFileIcon(file: File) {
   const extension = file.name.split(".").pop()?.toLowerCase() ?? "";
 
   if (type.startsWith("video/")) {
-    return <FileVideoIcon />;
+    return <IconVideoClip />;
   }
 
   if (type.startsWith("audio/")) {
-    return <FileAudioIcon />;
+    return <IconAudio />;
   }
 
   if (
     type.startsWith("text/") ||
     ["txt", "md", "rtf", "pdf"].includes(extension)
   ) {
-    return <FileTextIcon />;
+    return <IconFileText />;
   }
 
   if (
@@ -1050,7 +1049,7 @@ function getFileIcon(file: File) {
   }
 
   if (["zip", "rar", "7z", "tar", "gz", "bz2"].includes(extension)) {
-    return <FileArchiveIcon />;
+    return <IconFileZip />;
   }
 
   if (
@@ -1060,7 +1059,7 @@ function getFileIcon(file: File) {
     return <FileCogIcon />;
   }
 
-  return <FileIcon />;
+  return <IconFileBend />;
 }
 
 interface FileUploadItemPreviewProps extends React.ComponentProps<"div"> {
@@ -1115,7 +1114,7 @@ function FileUploadItemPreview(props: FileUploadItemPreviewProps) {
       data-slot="file-upload-preview"
       {...previewProps}
       className={cn(
-        "relative flex size-10 shrink-0 items-center justify-center overflow-hidden border bg-accent/50 [&>svg]:size-10",
+        "relative flex size-10 shrink-0 items-center justify-center overflow-hidden border bg-accent/50 [&>svg]:size-6",
         className
       )}
     >

@@ -13,6 +13,7 @@ import {
   FileUploadList,
   FileUploadTrigger,
 } from "~/components/ui/file-upload";
+import { transcribeAudio } from "~/lib/el-labs-utils";
 
 export function AudioUpload() {
   const [files, setFiles] = useState<File[]>([]);
@@ -25,8 +26,8 @@ export function AudioUpload() {
 
   async function onSubmit() {
     try {
-      // const text = await test("What is love?", "gpt-3.5-turbo");
-      // toast.success(text);
+      const transcription = await transcribeAudio(files[0]);
+      console.log("🚀 ~ onSubmit ~ transcription:", transcription);
     } catch (error) {
       toast.error("Error getting chat completion", {
         description: error instanceof Error ? error.message : "Unknown error",

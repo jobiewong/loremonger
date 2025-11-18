@@ -1,153 +1,113 @@
-// import "dotenv/config";
+import { openai } from "@ai-sdk/openai";
+import { generateText } from "ai";
+import OpenAI from "openai";
+import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
+import { toast } from "sonner";
+import { getRecord } from "~/lib/stronghold";
+import { calculateCost, getStrongholdStore } from "~/lib/utils";
+import { Player } from "~/types";
 
-// import ffmpeg from "fluent-ffmpeg";
-// import fs from "fs";
-// import OpenAI from "openai";
-// import path from "path";
+let cachedApiKey: string | null = null;
+let apiKeyPromise: Promise<string> | null = null;
+let cachedOpenAIClient: OpenAI | null = null;
 
-// const MAX_FILE_SIZE_MB = 25;
-// const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024; // 25MB in bytes
+async function getCachedOpenaiApiKey() {
+  if (cachedApiKey) {
+    return cachedApiKey;
+  }
+  if (!apiKeyPromise) {
+    const toastId = toast.loading("Loading OpenAI API key...");
+    apiKeyPromise = (async () => {
+      const store = await getStrongholdStore();
+      const apiKey = await getRecord(store, "openai-api-key");
+      cachedApiKey = apiKey;
+      apiKeyPromise = null;
+      toast.success("OpenAI API key loaded", { id: toastId });
+      return apiKey;
+    })().catch((error) => {
+      apiKeyPromise = null;
+      throw error;
+    });
+  }
+  return apiKeyPromise;
+}
 
-// const openai = new OpenAI({
-//   apiKey: process.env.OPENAI_API_KEY,
-// });
+export async function getOpenAIClient() {
+  if (cachedOpenAIClient) {
+    return cachedOpenAIClient;
+  }
+  const apiKey = await getCachedOpenaiApiKey();
+  cachedOpenAIClient = new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
+  return cachedOpenAIClient;
+}
 
-// /**
-//  * Get the duration of an audio file in seconds
-//  */
-// export async function getAudioDuration(filePath: string): Promise<number> {
-//   return new Promise((resolve, reject) => {
-//     ffmpeg.ffprobe(filePath, (err, metadata) => {
-//       if (err) {
-//         reject(err);
-//         return;
-//       }
-//       const duration = metadata.format.duration;
-//       if (duration === undefined) {
-//         reject(new Error("Could not determine audio duration"));
-//         return;
-//       }
-//       resolve(duration);
-//     });
-//   });
-// }
+export function resetOpenAICache() {
+  cachedOpenAIClient = null;
+  cachedApiKey = null;
+}
 
-// /**
-//  * Split an audio file into chunks that are under 25MB
-//  */
-// export async function splitAudioFile(
-//   inputPath: string,
-//   outputDir: string,
-//   targetSizeBytes: number
-// ): Promise<string[]> {
-//   const stats = fs.statSync(inputPath);
-//   const fileSize = stats.size;
+export async function getChatCompletion(
+  messages: ChatCompletionMessageParam[]
+) {
+  const openai = await getOpenAIClient();
+  const completion = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages,
+  });
+  return completion.choices[0].message.content;
+}
 
-//   if (fileSize <= targetSizeBytes) {
-//     return [inputPath];
-//   }
+export async function generateNotes(transcript: string, characters: Player[]) {
+  const toastId = toast.loading("Generating notes...");
+  try {
+    const systemPrompt = `
+  You are a helpful assistant that generates session notes for a Dungeons and Dragons game. Your goal is to capture the important details of the session. Write summary descriptions of characters and places in the session, as well as a timeline of events. Bear in mind that the transcript is a real-time transcription of the session, so it may contain some errors and typos on names. Try to correct the transcription where possible without making assumptions.
+  The players consist of the following characters: 
+  ${characters
+    .filter((character) => character.type === "player")
+    .map((character) => `${character.name} (${character.playerName})`)
+    .join("\n")}
+  The Dungeon Master(s) are ${characters
+    .filter((character) => character.type === "gm")
+    .map((character) => character.playerName)
+    .join(", ")}
+  The notes should be in markdown format with bold/italic/table/list/quote formatting where appropriate. Do not include any other text than the notes. Use a neutral tone and keep it concise while retaining important details.
+  The notes should include the following sections:
+  # Session Notes: (date)
+  ## Session Summary
+  ## Characters
+  ### Players
+  ### NPCs
+  ## Locations
+  ## Timeline of Events
+  ## Summary
+  ### Story Hooks
+  ### Key Clues, Lore, & Items of Interest
+  ### Next Steps
+  `;
 
-//   const duration = await getAudioDuration(inputPath);
+    const { tokens, cost } = calculateCost(transcript, "gpt-5-nano");
+    console.log("🚀 ~ generateNotes ~ tokens:", tokens, cost);
 
-//   const sizeRatio = fileSize / targetSizeBytes;
-//   const numChunks = Math.ceil(sizeRatio);
-//   const chunkDuration = duration / numChunks;
+    console.log("Generating notes...");
+    const { text, usage } = await generateText({
+      model: openai("gpt-5-nano"),
+      system: systemPrompt,
+      prompt: `Here is the session transcript you should use to generate the notes:
+    ${transcript}`,
+    });
 
-//   if (!fs.existsSync(outputDir)) {
-//     fs.mkdirSync(outputDir, { recursive: true });
-//   }
+    console.log("Notes generated");
+    console.log("Usage: ", JSON.stringify(usage, null, 2));
+    toast.success("Notes generated", { id: toastId });
 
-//   const chunkPaths: string[] = [];
-//   const baseName = path.basename(inputPath, path.extname(inputPath));
-//   const ext = path.extname(inputPath);
-
-//   for (let i = 0; i < numChunks; i++) {
-//     const startTime = i * chunkDuration;
-//     const chunkPath = path.join(outputDir, `${baseName}_chunk_${i + 1}${ext}`);
-
-//     await new Promise<void>((resolve, reject) => {
-//       ffmpeg(inputPath)
-//         .setStartTime(startTime)
-//         .setDuration(chunkDuration)
-//         .output(chunkPath)
-//         .on("end", () => {
-//           chunkPaths.push(chunkPath);
-//           resolve();
-//         })
-//         .on("error", (err) => {
-//           reject(err);
-//         })
-//         .run();
-//     });
-//   }
-
-//   return chunkPaths;
-// }
-
-// /**
-//  * Transcribe an audio file, splitting it into chunks if necessary
-//  */
-// export async function transcribeAudio(
-//   filePath: string,
-//   model: string = "gpt-4o-transcribe",
-//   responseFormat: string = "text",
-//   prompt: string = ""
-// ): Promise<string> {
-//   const stats = fs.statSync(filePath);
-//   const fileSize = stats.size;
-
-//   // If file is under 25MB, transcribe directly
-//   if (fileSize <= MAX_FILE_SIZE_BYTES) {
-//     const transcription = await openai.audio.transcriptions.create({
-//       file: fs.createReadStream(filePath),
-//       model,
-//       response_format: responseFormat as any,
-//       prompt,
-//     });
-//     return typeof transcription === "string"
-//       ? transcription
-//       : String(transcription);
-//   }
-
-//   console.log(
-//     `File size (${(fileSize / 1024 / 1024).toFixed(
-//       2
-//     )}MB) exceeds ${MAX_FILE_SIZE_MB}MB limit. Splitting into chunks...`
-//   );
-
-//   const tempDir = path.join(path.dirname(filePath), ".chunks");
-//   const chunkPaths = await splitAudioFile(
-//     filePath,
-//     tempDir,
-//     MAX_FILE_SIZE_BYTES
-//   );
-
-//   console.log(`Split into ${chunkPaths.length} chunks. Transcribing...`);
-
-//   const transcriptions: string[] = [];
-//   for (let i = 0; i < chunkPaths.length; i++) {
-//     console.log(`Transcribing chunk ${i + 1}/${chunkPaths.length}...`);
-//     const transcription = await openai.audio.transcriptions.create({
-//       file: fs.createReadStream(chunkPaths[i]),
-//       model,
-//       response_format: responseFormat as any,
-//       prompt,
-//     });
-//     const transcriptionText =
-//       typeof transcription === "string" ? transcription : String(transcription);
-//     transcriptions.push(transcriptionText);
-//   }
-
-//   for (const chunkPath of chunkPaths) {
-//     if (chunkPath !== filePath && fs.existsSync(chunkPath)) {
-//       fs.unlinkSync(chunkPath);
-//     }
-//   }
-//   if (fs.existsSync(tempDir)) {
-//     try {
-//       fs.rmdirSync(tempDir);
-//     } catch (err) {}
-//   }
-
-//   return transcriptions.join("\n\n");
-// }
+    return text;
+  } catch (error) {
+    console.error("🚀 ~ generateNotes ~ error:", error);
+    toast.error("Error generating notes", {
+      description: error instanceof Error ? error.message : "Unknown error",
+      id: toastId,
+    });
+    return null;
+  }
+}

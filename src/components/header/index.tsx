@@ -29,6 +29,9 @@ export function Header() {
               <Link to="/settings">
                 <DropdownMenuItem>Settings</DropdownMenuItem>
               </Link>
+              <Link to="/workbench">
+                <DropdownMenuItem>Workbench</DropdownMenuItem>
+              </Link>
             </DropdownMenuContent>
           </DropdownMenu>
           <DropdownMenu>
