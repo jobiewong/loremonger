@@ -11,6 +11,12 @@
     "fs:default",
     "fs:allow-create",
     "fs:allow-write-file",
-    "fs:allow-write-text-file"
+    "fs:allow-write-text-file",
+    "sql:default",
+    "sql:allow-load",
+    "sql:allow-execute",
+    "sql:allow-select",
+    "sql:allow-close",
+    "core:path:default"
   ]
 }

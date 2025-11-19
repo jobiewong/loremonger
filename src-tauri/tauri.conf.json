@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "loremonger-app",
+  "productName": "loremonger",
   "version": "0.1.0",
-  "identifier": "com.jobie.loremonger-app",
+  "identifier": "com.jobiewong.loremonger",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
@@ -32,5 +32,10 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
+  },
+  "plugins": {
+    "sql": {
+      "preload": ["sqlite:database.db"]
+    }
   }
 }

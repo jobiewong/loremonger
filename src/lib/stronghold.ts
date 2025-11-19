@@ -1,9 +1,20 @@
 import { appDataDir } from "@tauri-apps/api/path";
 import { Client, Store, Stronghold } from "@tauri-apps/plugin-stronghold";
 
+async function getMachineId(): Promise<string> {
+  const dataDir = await appDataDir();
+  return dataDir;
+}
+
+async function deriveVaultPassword(): Promise<string> {
+  const machineId = await getMachineId();
+  const appName = "loremonger-app";
+  return `${appName}-${machineId}`;
+}
+
 export const initStronghold = async () => {
   const vaultPath = `${await appDataDir()}/vault.hold`;
-  const vaultPassword = "vault password";
+  const vaultPassword = await deriveVaultPassword();
   const stronghold = await Stronghold.load(vaultPath, vaultPassword);
 
   let client: Client;
