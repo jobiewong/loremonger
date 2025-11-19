@@ -263,6 +263,11 @@
   * {
     @apply border-border-muted outline-ring/50;
   }
+  html,
+  body {
+    overscroll-behavior: none;
+  }
+
   body {
     @apply text-foreground;
   }
@@ -270,7 +275,7 @@
 
 @layer utilities {
   .preview {
-    @apply border border-red-500;
+    @apply border border-red-500!;
   }
 
   .page-wrapper {

@@ -46,7 +46,8 @@ const DropdownMenuSubContent = React.forwardRef<
   <DropdownMenuPrimitive.SubContent
     ref={ref}
     className={cn(
-      "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-32 origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-md border bg-gray-50 p-1 text-gray-800 shadow-lg",
+      "border-border z-50 max-h-(--radix-dropdown-menu-content-available-height) min-w-56 overflow-x-hidden overflow-y-auto border bg-background text-foreground shadow-md",
+      "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-(--radix-dropdown-menu-content-transform-origin)",
       className
     )}
     {...props}
@@ -65,7 +66,6 @@ const DropdownMenuContent = React.forwardRef<
       sideOffset={sideOffset}
       className={cn(
         "border-border z-50 max-h-(--radix-dropdown-menu-content-available-height) min-w-56 overflow-x-hidden overflow-y-auto border bg-background text-foreground shadow-md",
-        "dark:from-gray-600/60 dark:to-gray-800/60 dark:shadow-md dark:text-gray-100",
         "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-(--radix-dropdown-menu-content-transform-origin)",
         className
       )}

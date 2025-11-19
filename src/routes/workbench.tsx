@@ -1,12 +1,9 @@
 import { useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { uuidv7 } from "zod/v4";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import campaignsCollection from "~/server/collections/campaigns";
-import db from "~/server/db";
-import { campaigns } from "~/server/db/schema";
 
 export const Route = createFileRoute("/workbench")({
   component: RouteComponent,
@@ -14,16 +11,16 @@ export const Route = createFileRoute("/workbench")({
 
 function RouteComponent() {
   const [name, setName] = useState("");
-  async function handleCreateCampaign() {
-    const id = Number(uuidv7());
-    campaignsCollection.insert({
-      id,
-      name,
-      description: "This is a test campaign",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    });
-  }
+  // async function handleCreateCampaign() {
+  //   const id = Number(uuidv7());
+  //   campaignsCollection.insert({
+  //     id,
+  //     name,
+  //     description: "This is a test campaign",
+  //     createdAt: new Date().toISOString(),
+  //     updatedAt: new Date().toISOString(),
+  //   });
+  // }
 
   const { data } = useLiveQuery((q) =>
     q.from({ campaigns: campaignsCollection })
@@ -43,7 +40,7 @@ function RouteComponent() {
           ))}
         </ul>
         <Input value={name} onChange={(e) => setName(e.target.value)} />
-        <Button onClick={handleCreateCampaign}>Create Campaign</Button>
+        <Button>Create Campaign</Button>
       </div>
     </main>
   );

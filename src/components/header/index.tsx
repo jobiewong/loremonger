@@ -9,6 +9,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 
@@ -23,9 +26,15 @@ export function Header() {
               File
             </DropdownMenuTrigger>
             <DropdownMenuContent side="bottom" sideOffset={5} align="start">
-              <Link to="/">
-                <DropdownMenuItem>New Session</DropdownMenuItem>
-              </Link>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>New</DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <DropdownMenuItem>Session</DropdownMenuItem>
+                  <Link to="/campaign/new">
+                    <DropdownMenuItem>Campaign</DropdownMenuItem>
+                  </Link>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
               <Link to="/settings">
                 <DropdownMenuItem>Settings</DropdownMenuItem>
               </Link>
