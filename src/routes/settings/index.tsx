@@ -73,8 +73,8 @@ function RouteComponent() {
           <div className="w-full  gap-2 flex flex-col">
             <Label>ElevenLabs API Key</Label>
             <Input
-              value={openaiValue}
-              onChange={(e) => setOpenaiValue(e.target.value)}
+              value={elevenLabsValue}
+              onChange={(e) => setElevenLabsValue(e.target.value)}
               className="offset-border"
             />
           </div>

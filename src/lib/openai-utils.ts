@@ -1,7 +1,5 @@
 import { createOpenAI } from "@ai-sdk/openai";
 import { generateText } from "ai";
-import OpenAI from "openai";
-import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 import { toast } from "sonner";
 import { getRecord } from "~/lib/stronghold";
 import { calculateCost, getStrongholdStore } from "~/lib/utils";
