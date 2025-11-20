@@ -1,3 +1,4 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { IconFolder2, IconSquareInfo } from "central-icons";
 import { Controller, useForm, UseFormReturn } from "react-hook-form";
 import { z } from "zod/v4";
@@ -5,6 +6,7 @@ import { Button } from "~/components/ui/button";
 import {
   Field,
   FieldDescription,
+  FieldError,
   FieldLabel,
   FieldLegend,
   FieldSet,
@@ -23,7 +25,9 @@ export function CampaignDetailsForm({
 }: {
   onSubmit: (values: z.infer<typeof campaignDetailsSchema>) => void;
 }) {
-  const form = useForm<z.infer<typeof campaignDetailsSchema>>();
+  const form = useForm<z.infer<typeof campaignDetailsSchema>>({
+    resolver: zodResolver(campaignDetailsSchema),
+  });
   return (
     <form
       className="w-full mt-4 space-y-6"
@@ -42,6 +46,7 @@ export function CampaignDetailsForm({
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor="name">Campaign Name</FieldLabel>
               <Input {...field} id="name" placeholder="e.g. Waterdeep Heist" />
+              <FieldError errors={[fieldState.error]} />
             </Field>
           )}
         />
@@ -56,6 +61,7 @@ export function CampaignDetailsForm({
                 id="description"
                 className="min-h-[5em] resize-none"
               />
+              <FieldError errors={[fieldState.error]} />
             </Field>
           )}
         />
@@ -66,6 +72,7 @@ export function CampaignDetailsForm({
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor="dmName">Dungeon Master</FieldLabel>
               <Input {...field} id="dmName" placeholder="e.g. John Doe" />
+              <FieldError errors={[fieldState.error]} />
             </Field>
           )}
         />
@@ -83,6 +90,7 @@ export function CampaignDetailsForm({
                 id="outputDirectory"
                 placeholder="e.g. /path/to/output"
               />
+              <FieldError errors={[fieldState.error]} />
             </Field>
           )}
         />
@@ -121,6 +129,7 @@ export function CampaignDetailsForm({
                 id="namingConvention"
                 placeholder="e.g. {campaignName}-{sessionNumber}"
               />
+              <FieldError errors={[fieldState.error]} />
             </Field>
           )}
         />

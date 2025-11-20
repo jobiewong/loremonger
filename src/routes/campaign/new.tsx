@@ -1,10 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { IconFolder2 } from "central-icons";
 import { createInsertSchema } from "drizzle-zod";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
 import { z } from "zod/v4";
-import { Button } from "~/components/ui/button";
 
 import { Scroller } from "~/components/ui/scroller";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
@@ -17,8 +14,15 @@ export const Route = createFileRoute("/campaign/new")({
   component: RouteComponent,
 });
 
-export const campaignDetailsSchema = createInsertSchema(campaigns);
-export const partyMembersSchema = createInsertSchema(players);
+export const campaignDetailsSchema = createInsertSchema(campaigns, {
+  name: (schema) => schema.min(1, "Campaign name is required"),
+  dmName: (schema) => schema.min(1, "Dungeon master name is required"),
+});
+export const partyMembersSchema = createInsertSchema(players, {
+  playerName: (schema) => schema.min(2, "Player name must be at least 2 chars"),
+  characterName: (schema) =>
+    schema.min(2, "Character name must be at least 2 chars"),
+});
 
 function RouteComponent() {
   const [partyMembers, setPartyMembers] = useState<
@@ -38,7 +42,14 @@ function RouteComponent() {
           <Tabs defaultValue="details" className="mt-6">
             <TabsList className="-mx-4 w-[calc(100%+2rem+2px)] -translate-x-px">
               <TabsTrigger value="details">Details</TabsTrigger>
-              <TabsTrigger value="party">Party</TabsTrigger>
+              <TabsTrigger value="party">
+                Party
+                {partyMembers.length > 0 && (
+                  <span className="text-muted-foreground">
+                    ({partyMembers.length})
+                  </span>
+                )}
+              </TabsTrigger>
             </TabsList>
             <TabsContent value="details">
               <CampaignDetailsForm onSubmit={handleCreateCampaign} />
