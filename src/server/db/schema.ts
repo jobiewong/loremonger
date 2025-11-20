@@ -19,7 +19,6 @@ export const campaignRelations = relations(campaigns, ({ many }) => ({
 
 export const players = sqliteTable("players", {
   id: integer("id").primaryKey({ autoIncrement: true }),
-  name: text("name").notNull(),
   playerName: text("player_name").notNull(),
   characterName: text("character_name").notNull(),
   campaignId: integer("campaign_id").references(() => campaigns.id),
