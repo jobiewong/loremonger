@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useTheme } from "next-themes";
 import packageJson from "~/../package.json";
+import { TimeAgo } from "~/components/time-ago";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,15 +43,28 @@ export function Header() {
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger>Open</DropdownMenuSubTrigger>
                   <DropdownMenuSubContent>
-                    {campaigns.map((campaign) => (
-                      <Link
-                        to="/campaign/$id"
-                        params={{ id: campaign.id.toString() }}
-                        key={campaign.id}
-                      >
-                        <DropdownMenuItem>{campaign.name}</DropdownMenuItem>
-                      </Link>
-                    ))}
+                    {campaigns.map((campaign) => {
+                      const updatedAt = new Date(
+                        campaign.updatedAt ?? new Date()
+                      );
+                      return (
+                        <Link
+                          to="/campaign/$id"
+                          params={{ id: campaign.id.toString() }}
+                          key={campaign.id}
+                        >
+                          <DropdownMenuItem>
+                            <span className="flex-1">{campaign.name}</span>
+                            {campaign.updatedAt && (
+                              <TimeAgo
+                                date={updatedAt}
+                                className="inline-block"
+                              />
+                            )}
+                          </DropdownMenuItem>
+                        </Link>
+                      );
+                    })}
                   </DropdownMenuSubContent>
                 </DropdownMenuSub>
               )}

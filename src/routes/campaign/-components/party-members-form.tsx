@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IconCrossMedium, IconPeopleAdd } from "central-icons";
+import { useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod/v4";
 import { Badge } from "~/components/ui/badge";
@@ -13,6 +14,14 @@ import {
   FieldSet,
 } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "~/components/ui/table";
 import { generateId } from "~/lib/utils";
 import { partyMembersSchema } from "~/routes/campaign/new";
 import { Setter } from "~/types";
@@ -24,6 +33,7 @@ export function PartyMembersForm({
   partyMembers: z.infer<typeof partyMembersSchema>[];
   setPartyMembers: Setter<z.infer<typeof partyMembersSchema>[]>;
 }) {
+  const nameRef = useRef<HTMLInputElement>(null);
   const form = useForm<z.infer<typeof partyMembersSchema>>({
     resolver: zodResolver(partyMembersSchema),
     defaultValues: {
@@ -40,6 +50,7 @@ export function PartyMembersForm({
       playerName: "",
       characterName: "",
     });
+    nameRef.current?.focus();
   }
 
   return (
@@ -47,21 +58,49 @@ export function PartyMembersForm({
       className="w-full mt-4 space-y-6"
       onSubmit={form.handleSubmit(handleSubmit)}
     >
-      <ul className="border-y -mx-4 w-[calc(100%+2rem)] space-y-2">
-        {partyMembers.length > 0 ? (
-          partyMembers.map((member) => (
-            <PartyMemberItem
-              key={member.id}
-              member={member}
-              setPartyMembers={setPartyMembers}
-            />
-          ))
-        ) : (
-          <p className="text-center text-sm text-muted-foreground py-2">
-            No party members added yet.
-          </p>
-        )}
-      </ul>
+      <Table className="table-fixed">
+        <TableHeader>
+          <TableRow>
+            <TableHead>Player</TableHead>
+            <TableHead>Character</TableHead>
+            <TableHead />
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {partyMembers.length > 0 ? (
+            partyMembers.map((member) => (
+              <TableRow key={member.id}>
+                <TableCell>{member.playerName}</TableCell>
+                <TableCell>{member.characterName}</TableCell>
+                <TableCell className="w-6 px-0 text-right">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    type="button"
+                    className="size-6"
+                    onClick={() =>
+                      setPartyMembers((prev) =>
+                        prev.filter((m) => m.id !== member.id)
+                      )
+                    }
+                  >
+                    <IconCrossMedium />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell
+                colSpan={3}
+                className="w-full text-center text-muted-foreground"
+              >
+                No party members added yet.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
       <FieldSet>
         <FieldLegend>Party Members</FieldLegend>
         <FieldDescription>
@@ -74,7 +113,12 @@ export function PartyMembersForm({
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor="playerName">Player Name</FieldLabel>
-              <Input {...field} id="playerName" placeholder="e.g. Jane Doe" />
+              <Input
+                {...field}
+                ref={nameRef}
+                id="playerName"
+                placeholder="e.g. Jane Doe"
+              />
               <FieldError errors={[fieldState.error]} />
             </Field>
           )}
@@ -108,17 +152,22 @@ function PartyMemberItem({
 }) {
   return (
     <li
-      className="text-sm flex items-center justify-between px-4 py-2"
+      className="text-sm flex items-center justify-between pl-4"
       key={member.id}
     >
       <div className="flex flex-col gap-1">
-        <p className="font-bold">{member.characterName}</p>
-        <Badge variant="outline">{member.playerName}</Badge>
+        <p className="font-bold">
+          {member.characterName}
+          <Badge variant="outline" className="ml-2 text-xs">
+            {member.playerName}
+          </Badge>
+        </p>
       </div>
       <Button
         variant="ghost"
         size="icon"
         type="button"
+        className="h-fit p-2"
         onClick={() =>
           setPartyMembers((prev) => prev.filter((m) => m.id !== member.id))
         }

@@ -14,7 +14,6 @@ dist-ssr
 .env
 .env.local
 .env.production
-routeTree.gen.ts
 
 # Editor directories and files
 .vscode/*

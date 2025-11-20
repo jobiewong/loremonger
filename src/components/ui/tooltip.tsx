@@ -35,9 +35,14 @@ function TooltipTrigger({
 function TooltipContent({
   className,
   sideOffset = 0,
+  classNames,
   children,
   ...props
-}: React.ComponentProps<typeof TooltipPrimitive.Content>) {
+}: React.ComponentProps<typeof TooltipPrimitive.Content> & {
+  classNames?: {
+    arrow?: string;
+  };
+}) {
   return (
     <TooltipPrimitive.Portal>
       <TooltipPrimitive.Content
@@ -50,7 +55,12 @@ function TooltipContent({
         {...props}
       >
         {children}
-        <TooltipPrimitive.Arrow className="bg-foreground fill-foreground z-50 size-2.5 translate-y-[calc(50%-2px)] rotate-45" />
+        <TooltipPrimitive.Arrow
+          className={cn(
+            "bg-foreground fill-foreground z-50 size-2.5 -translate-y-[calc(50%+2px)] rotate-45",
+            classNames?.arrow
+          )}
+        />
       </TooltipPrimitive.Content>
     </TooltipPrimitive.Portal>
   );

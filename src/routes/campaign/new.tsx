@@ -5,7 +5,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod/v4";
-import { AlertDialog } from "~/components/ui/alert-dialog";
 
 import { Scroller } from "~/components/ui/scroller";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
@@ -22,14 +21,17 @@ export const Route = createFileRoute("/campaign/new")({
   component: RouteComponent,
 });
 
-export const campaignDetailsSchema = createInsertSchema(campaigns, {
-  name: (schema) => schema.min(1, "Campaign name is required"),
-  dmName: (schema) => schema.min(1, "Dungeon master name is required"),
+export const campaignDetailsSchema = z.object({
+  name: z.string().min(1, "Campaign name is required"),
+  description: z.string().optional(),
+  dmName: z.string().min(1, "Dungeon master name is required"),
+  outputDirectory: z.string().optional(),
+  namingConvention: z.string().optional(),
 });
-export const partyMembersSchema = createInsertSchema(players, {
-  playerName: (schema) => schema.min(2, "Player name must be at least 2 chars"),
-  characterName: (schema) =>
-    schema.min(2, "Character name must be at least 2 chars"),
+export const partyMembersSchema = z.object({
+  id: z.string(),
+  playerName: z.string().min(2, "Player name must be at least 2 chars"),
+  characterName: z.string().min(2, "Character name must be at least 2 chars"),
 });
 
 function RouteComponent() {
@@ -41,12 +43,10 @@ function RouteComponent() {
   const form = useForm<z.infer<typeof campaignDetailsSchema>>({
     resolver: zodResolver(campaignDetailsSchema),
     defaultValues: {
-      id: "",
       name: "",
       dmName: "",
     },
   });
-  console.log(form.formState.errors);
 
   function submitCampaignForm(values: z.infer<typeof campaignDetailsSchema>) {
     if (partyMembers.length === 0) {
@@ -69,6 +69,8 @@ function RouteComponent() {
       namingConvention: values.namingConvention ?? null,
       createdAt: date,
       updatedAt: date,
+      players: [],
+      sessions: [],
     });
 
     for (const player of partyMembers) {
@@ -89,7 +91,7 @@ function RouteComponent() {
   return (
     <main className="page-wrapper flex flex-col items-center">
       <div className="content-wrapper justify-start! overflow-hidden">
-        <Scroller className="size-full max-h-[calc(100vh-var(--header-height))] overflow-x-hidden py-8 px-4">
+        <Scroller className="size-full overflow-x-hidden py-8 px-4">
           <h1 className="text-2xl font-bold">New Campaign</h1>
 
           <Tabs defaultValue="details" className="mt-6">

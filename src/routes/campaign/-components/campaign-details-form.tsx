@@ -105,7 +105,12 @@ export function CampaignDetailsForm({
                   <TooltipTrigger>
                     <IconSquareInfo className="size-4 opacity-60 hover:opacity-100" />
                   </TooltipTrigger>
-                  <TooltipContent className="max-w-xs space-y-2">
+                  <TooltipContent
+                    className="max-w-xs space-y-2"
+                    classNames={{
+                      arrow: "translate-y-[calc(50%-2px)]",
+                    }}
+                  >
                     <p>
                       Determines the generated file name for each session note.
                       The following variables are available:

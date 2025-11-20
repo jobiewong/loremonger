@@ -22,8 +22,12 @@ export const players = sqliteTable("players", {
   playerName: text("player_name").notNull(),
   characterName: text("character_name").notNull(),
   campaignId: text("campaign_id").references(() => campaigns.id),
-  createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
-  updatedAt: text("updated_at").default(sql`CURRENT_TIMESTAMP`),
+  createdAt: text("created_at")
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: text("updated_at")
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
 });
 
 export const playerRelations = relations(players, ({ one }) => ({
@@ -37,8 +41,12 @@ export const sessions = sqliteTable("sessions", {
   id: text("id").primaryKey(),
   campaignId: text("campaign_id").references(() => campaigns.id),
   date: text("date").notNull(),
-  createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
-  updatedAt: text("updated_at").default(sql`CURRENT_TIMESTAMP`),
+  createdAt: text("created_at")
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: text("updated_at")
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
 });
 
 export const sessionRelations = relations(sessions, ({ one }) => ({

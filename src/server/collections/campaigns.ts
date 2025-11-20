@@ -1,7 +1,7 @@
 import { createCollection } from "@tanstack/db";
 import { queryCollectionOptions } from "@tanstack/query-db-collection";
 import { useLiveQuery } from "@tanstack/react-db";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { queryClient } from "~/server/collections";
 import db from "~/server/db";
 import { campaigns } from "~/server/db/schema";
@@ -11,7 +11,13 @@ const campaignsCollection = createCollection(
     queryKey: ["campaigns"],
     queryClient: queryClient,
     queryFn: async () => {
-      return await db.query.campaigns.findMany();
+      return await db.query.campaigns.findMany({
+        orderBy: [desc(campaigns.updatedAt)],
+        with: {
+          players: true,
+          sessions: true,
+        },
+      });
     },
     getKey: (campaign) => campaign.id,
     onInsert: async ({ transaction }) => {

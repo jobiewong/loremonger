@@ -29,6 +29,13 @@
       "when": 1763634336615,
       "tag": "0003_sticky_lockjaw",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1763637919595,
+      "tag": "0004_heavy_marvel_zombies",
+      "breakpoints": true
     }
   ]
 }
