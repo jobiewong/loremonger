@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AudioUpload } from "~/components/audio-upload";
 import "~/styles/globals.css";
 
 export const Route = createFileRoute("/")({
@@ -10,7 +9,7 @@ function RouteComponent() {
   return (
     <main className="page-wrapper flex flex-col items-center">
       <div className="content-wrapper">
-        <AudioUpload />
+        <h1>Loremonger</h1>
       </div>
     </main>
   );

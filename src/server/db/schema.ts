@@ -40,6 +40,8 @@ export const playerRelations = relations(players, ({ one }) => ({
 export const sessions = sqliteTable("sessions", {
   id: text("id").primaryKey(),
   campaignId: text("campaign_id").references(() => campaigns.id),
+  number: integer("number").notNull(),
+  name: text("name"),
   date: text("date").notNull(),
   createdAt: text("created_at")
     .default(sql`CURRENT_TIMESTAMP`)

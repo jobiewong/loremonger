@@ -15,7 +15,8 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as CampaignNewRouteImport } from './routes/campaign/new'
-import { Route as CampaignIdRouteImport } from './routes/campaign/$id'
+import { Route as CampaignCampaignIdIndexRouteImport } from './routes/campaign/$campaignId/index'
+import { Route as CampaignCampaignIdSessionIdIndexRouteImport } from './routes/campaign/$campaignId/$sessionId/index'
 
 const WorkbenchRoute = WorkbenchRouteImport.update({
   id: '/workbench',
@@ -47,29 +48,37 @@ const CampaignNewRoute = CampaignNewRouteImport.update({
   path: '/campaign/new',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CampaignIdRoute = CampaignIdRouteImport.update({
-  id: '/campaign/$id',
-  path: '/campaign/$id',
+const CampaignCampaignIdIndexRoute = CampaignCampaignIdIndexRouteImport.update({
+  id: '/campaign/$campaignId/',
+  path: '/campaign/$campaignId/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CampaignCampaignIdSessionIdIndexRoute =
+  CampaignCampaignIdSessionIdIndexRouteImport.update({
+    id: '/campaign/$campaignId/$sessionId/',
+    path: '/campaign/$campaignId/$sessionId/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/help': typeof HelpRoute
   '/workbench': typeof WorkbenchRoute
-  '/campaign/$id': typeof CampaignIdRoute
   '/campaign/new': typeof CampaignNewRoute
   '/settings': typeof SettingsIndexRoute
+  '/campaign/$campaignId': typeof CampaignCampaignIdIndexRoute
+  '/campaign/$campaignId/$sessionId': typeof CampaignCampaignIdSessionIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/help': typeof HelpRoute
   '/workbench': typeof WorkbenchRoute
-  '/campaign/$id': typeof CampaignIdRoute
   '/campaign/new': typeof CampaignNewRoute
   '/settings': typeof SettingsIndexRoute
+  '/campaign/$campaignId': typeof CampaignCampaignIdIndexRoute
+  '/campaign/$campaignId/$sessionId': typeof CampaignCampaignIdSessionIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -77,9 +86,10 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/help': typeof HelpRoute
   '/workbench': typeof WorkbenchRoute
-  '/campaign/$id': typeof CampaignIdRoute
   '/campaign/new': typeof CampaignNewRoute
   '/settings/': typeof SettingsIndexRoute
+  '/campaign/$campaignId/': typeof CampaignCampaignIdIndexRoute
+  '/campaign/$campaignId/$sessionId/': typeof CampaignCampaignIdSessionIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -88,27 +98,30 @@ export interface FileRouteTypes {
     | '/about'
     | '/help'
     | '/workbench'
-    | '/campaign/$id'
     | '/campaign/new'
     | '/settings'
+    | '/campaign/$campaignId'
+    | '/campaign/$campaignId/$sessionId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/help'
     | '/workbench'
-    | '/campaign/$id'
     | '/campaign/new'
     | '/settings'
+    | '/campaign/$campaignId'
+    | '/campaign/$campaignId/$sessionId'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/help'
     | '/workbench'
-    | '/campaign/$id'
     | '/campaign/new'
     | '/settings/'
+    | '/campaign/$campaignId/'
+    | '/campaign/$campaignId/$sessionId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -116,9 +129,10 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   HelpRoute: typeof HelpRoute
   WorkbenchRoute: typeof WorkbenchRoute
-  CampaignIdRoute: typeof CampaignIdRoute
   CampaignNewRoute: typeof CampaignNewRoute
   SettingsIndexRoute: typeof SettingsIndexRoute
+  CampaignCampaignIdIndexRoute: typeof CampaignCampaignIdIndexRoute
+  CampaignCampaignIdSessionIdIndexRoute: typeof CampaignCampaignIdSessionIdIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -165,11 +179,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CampaignNewRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/campaign/$id': {
-      id: '/campaign/$id'
-      path: '/campaign/$id'
-      fullPath: '/campaign/$id'
-      preLoaderRoute: typeof CampaignIdRouteImport
+    '/campaign/$campaignId/': {
+      id: '/campaign/$campaignId/'
+      path: '/campaign/$campaignId'
+      fullPath: '/campaign/$campaignId'
+      preLoaderRoute: typeof CampaignCampaignIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/campaign/$campaignId/$sessionId/': {
+      id: '/campaign/$campaignId/$sessionId/'
+      path: '/campaign/$campaignId/$sessionId'
+      fullPath: '/campaign/$campaignId/$sessionId'
+      preLoaderRoute: typeof CampaignCampaignIdSessionIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -180,9 +201,10 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   HelpRoute: HelpRoute,
   WorkbenchRoute: WorkbenchRoute,
-  CampaignIdRoute: CampaignIdRoute,
   CampaignNewRoute: CampaignNewRoute,
   SettingsIndexRoute: SettingsIndexRoute,
+  CampaignCampaignIdIndexRoute: CampaignCampaignIdIndexRoute,
+  CampaignCampaignIdSessionIdIndexRoute: CampaignCampaignIdSessionIdIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

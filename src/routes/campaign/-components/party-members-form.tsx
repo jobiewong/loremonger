@@ -58,7 +58,7 @@ export function PartyMembersForm({
       className="w-full mt-4 space-y-6"
       onSubmit={form.handleSubmit(handleSubmit)}
     >
-      <Table className="table-fixed">
+      <Table>
         <TableHeader>
           <TableRow>
             <TableHead>Player</TableHead>

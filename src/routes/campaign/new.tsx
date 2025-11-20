@@ -15,8 +15,6 @@ import { PartyMembersForm } from "~/routes/campaign/-components/party-members-fo
 import campaignsCollection from "~/server/collections/campaigns";
 import playersCollection from "~/server/collections/players";
 
-import { campaigns, players } from "~/server/db/schema";
-
 export const Route = createFileRoute("/campaign/new")({
   component: RouteComponent,
 });
@@ -85,7 +83,7 @@ function RouteComponent() {
     toast.success(`Campaign created`, {
       description: values.name,
     });
-    navigate({ to: "/campaign/$id", params: { id } });
+    navigate({ to: "/campaign/$campaignId", params: { campaignId: id } });
   }
 
   return (

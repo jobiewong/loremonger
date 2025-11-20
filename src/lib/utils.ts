@@ -81,3 +81,7 @@ export async function saveFileWithPrompt(file: File) {
 export function generateId() {
   return uuidv7();
 }
+
+export function isEmpty(value: string | null | undefined) {
+  return value === null || value === undefined || value.trim() === "";
+}
