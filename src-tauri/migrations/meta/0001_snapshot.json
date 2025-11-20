@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "df85fc07-859d-491b-87ce-601f0b1702a4",
-  "prevId": "14e4d419-b24b-4cd1-b3fe-adc869230feb",
+  "id": "bb183ea8-66be-4826-a144-f1f5dadd8edb",
+  "prevId": "977708a0-9e31-4a65-853f-ecd0e44d343d",
   "tables": {
     "campaigns": {
       "name": "campaigns",
@@ -32,7 +32,7 @@
           "name": "description",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "output_directory": {
@@ -81,13 +81,6 @@
           "primaryKey": true,
           "notNull": true,
           "autoincrement": true
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
         },
         "player_name": {
           "name": "player_name",

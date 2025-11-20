@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "4806712a-4c14-48bc-8dd2-1b3f20c6f25b",
-  "prevId": "bb183ea8-66be-4826-a144-f1f5dadd8edb",
+  "id": "e467ddad-eb8a-4a8a-ba81-614b4c4198f9",
+  "prevId": "4806712a-4c14-48bc-8dd2-1b3f20c6f25b",
   "tables": {
     "campaigns": {
       "name": "campaigns",
@@ -98,7 +98,7 @@
         },
         "campaign_id": {
           "name": "campaign_id",
-          "type": "integer",
+          "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -152,7 +152,7 @@
         },
         "campaign_id": {
           "name": "campaign_id",
-          "type": "integer",
+          "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false

@@ -5,6 +5,7 @@ import { Store } from "@tauri-apps/plugin-stronghold";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { encoding_for_model, type TiktokenModel } from "tiktoken";
+import { v7 as uuidv7 } from "uuid";
 import { initStronghold } from "~/lib/stronghold";
 
 let strongholdStorePromise: Promise<Store> | null = null;
@@ -75,4 +76,8 @@ export async function saveFileWithPrompt(file: File) {
     await fileRef.write(content);
     await fileRef.close();
   }
+}
+
+export function generateId() {
+  return uuidv7();
 }

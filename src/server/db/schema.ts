@@ -2,10 +2,10 @@ import { relations, sql } from "drizzle-orm";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const campaigns = sqliteTable("campaigns", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+  id: text("id").primaryKey(),
   name: text("name").notNull(),
   dmName: text("dm_name").notNull(),
-  description: text("description").notNull(),
+  description: text("description"),
   outputDirectory: text("output_directory"),
   namingConvention: text("naming_convention"),
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
@@ -18,10 +18,10 @@ export const campaignRelations = relations(campaigns, ({ many }) => ({
 }));
 
 export const players = sqliteTable("players", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+  id: text("id").primaryKey(),
   playerName: text("player_name").notNull(),
   characterName: text("character_name").notNull(),
-  campaignId: integer("campaign_id").references(() => campaigns.id),
+  campaignId: text("campaign_id").references(() => campaigns.id),
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
   updatedAt: text("updated_at").default(sql`CURRENT_TIMESTAMP`),
 });
@@ -34,8 +34,8 @@ export const playerRelations = relations(players, ({ one }) => ({
 }));
 
 export const sessions = sqliteTable("sessions", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  campaignId: integer("campaign_id").references(() => campaigns.id),
+  id: text("id").primaryKey(),
+  campaignId: text("campaign_id").references(() => campaigns.id),
   date: text("date").notNull(),
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
   updatedAt: text("updated_at").default(sql`CURRENT_TIMESTAMP`),

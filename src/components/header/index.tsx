@@ -14,9 +14,12 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { useCampaigns } from "~/server/collections/campaigns";
 
 export function Header() {
   const { theme, setTheme } = useTheme();
+  const { data: campaigns } = useCampaigns();
+
   return (
     <header className="h-(--header-height) flex items-center justify-between border-b border-muted-border px-4 bg-background">
       <div>
@@ -35,12 +38,28 @@ export function Header() {
                   </Link>
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
+              {campaigns && campaigns.length > 0 && (
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>Open</DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>
+                    {campaigns.map((campaign) => (
+                      <Link
+                        to="/campaign/$id"
+                        params={{ id: campaign.id.toString() }}
+                        key={campaign.id}
+                      >
+                        <DropdownMenuItem>{campaign.name}</DropdownMenuItem>
+                      </Link>
+                    ))}
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+              )}
               <Link to="/settings">
                 <DropdownMenuItem>Settings</DropdownMenuItem>
               </Link>
-              <Link to="/workbench">
+              {/* <Link to="/workbench">
                 <DropdownMenuItem>Workbench</DropdownMenuItem>
-              </Link>
+              </Link> */}
             </DropdownMenuContent>
           </DropdownMenu>
           <DropdownMenu>

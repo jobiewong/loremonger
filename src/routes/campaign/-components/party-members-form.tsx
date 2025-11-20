@@ -13,11 +13,7 @@ import {
   FieldSet,
 } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "~/components/ui/tooltip";
+import { generateId } from "~/lib/utils";
 import { partyMembersSchema } from "~/routes/campaign/new";
 import { Setter } from "~/types";
 
@@ -31,13 +27,16 @@ export function PartyMembersForm({
   const form = useForm<z.infer<typeof partyMembersSchema>>({
     resolver: zodResolver(partyMembersSchema),
     defaultValues: {
+      id: "",
       playerName: "",
       characterName: "",
     },
   });
   function handleSubmit(values: z.infer<typeof partyMembersSchema>) {
-    setPartyMembers((prev) => [...prev, values]);
+    const id = generateId();
+    setPartyMembers((prev) => [...prev, { ...values, id }]);
     form.reset({
+      id: "",
       playerName: "",
       characterName: "",
     });
@@ -92,7 +91,7 @@ export function PartyMembersForm({
           )}
         />
       </FieldSet>
-      <Button className="w-full">
+      <Button className="w-full" type="submit">
         <IconPeopleAdd />
         Create Player
       </Button>

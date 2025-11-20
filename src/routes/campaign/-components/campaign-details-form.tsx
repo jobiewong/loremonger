@@ -21,13 +21,12 @@ import {
 import { campaignDetailsSchema } from "~/routes/campaign/new";
 
 export function CampaignDetailsForm({
+  form,
   onSubmit,
 }: {
+  form: UseFormReturn<z.infer<typeof campaignDetailsSchema>>;
   onSubmit: (values: z.infer<typeof campaignDetailsSchema>) => void;
 }) {
-  const form = useForm<z.infer<typeof campaignDetailsSchema>>({
-    resolver: zodResolver(campaignDetailsSchema),
-  });
   return (
     <form
       className="w-full mt-4 space-y-6"
@@ -58,6 +57,7 @@ export function CampaignDetailsForm({
               <FieldLabel htmlFor="description">Description</FieldLabel>
               <Textarea
                 {...field}
+                value={field.value ?? undefined}
                 id="description"
                 className="min-h-[5em] resize-none"
               />

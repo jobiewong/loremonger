@@ -1,12 +1,20 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { createInsertSchema } from "drizzle-zod";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod/v4";
+import { AlertDialog } from "~/components/ui/alert-dialog";
 
 import { Scroller } from "~/components/ui/scroller";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { generateId } from "~/lib/utils";
 import { CampaignDetailsForm } from "~/routes/campaign/-components/campaign-details-form";
+import { NoPlayerAlertDialog } from "~/routes/campaign/-components/no-player-alert-dialog";
 import { PartyMembersForm } from "~/routes/campaign/-components/party-members-form";
+import campaignsCollection from "~/server/collections/campaigns";
+import playersCollection from "~/server/collections/players";
 
 import { campaigns, players } from "~/server/db/schema";
 
@@ -28,9 +36,54 @@ function RouteComponent() {
   const [partyMembers, setPartyMembers] = useState<
     z.infer<typeof partyMembersSchema>[]
   >([]);
+  const navigate = useNavigate();
+  const [noPlayerAlertDialogOpen, setNoPlayerAlertDialogOpen] = useState(false);
+  const form = useForm<z.infer<typeof campaignDetailsSchema>>({
+    resolver: zodResolver(campaignDetailsSchema),
+    defaultValues: {
+      id: "",
+      name: "",
+      dmName: "",
+    },
+  });
+  console.log(form.formState.errors);
+
+  function submitCampaignForm(values: z.infer<typeof campaignDetailsSchema>) {
+    if (partyMembers.length === 0) {
+      setNoPlayerAlertDialogOpen(true);
+      return;
+    } else {
+      handleCreateCampaign(values);
+    }
+  }
 
   function handleCreateCampaign(values: z.infer<typeof campaignDetailsSchema>) {
-    console.log(values);
+    const id = generateId();
+    const date = new Date().toISOString();
+
+    campaignsCollection.insert({
+      ...values,
+      id,
+      description: values.description ?? null,
+      outputDirectory: values.outputDirectory ?? null,
+      namingConvention: values.namingConvention ?? null,
+      createdAt: date,
+      updatedAt: date,
+    });
+
+    for (const player of partyMembers) {
+      playersCollection.insert({
+        ...player,
+        campaignId: id,
+        createdAt: date,
+        updatedAt: date,
+      });
+    }
+
+    toast.success(`Campaign created`, {
+      description: values.name,
+    });
+    navigate({ to: "/campaign/$id", params: { id } });
   }
 
   return (
@@ -52,7 +105,7 @@ function RouteComponent() {
               </TabsTrigger>
             </TabsList>
             <TabsContent value="details">
-              <CampaignDetailsForm onSubmit={handleCreateCampaign} />
+              <CampaignDetailsForm form={form} onSubmit={submitCampaignForm} />
             </TabsContent>
             <TabsContent value="party">
               <PartyMembersForm
@@ -63,6 +116,11 @@ function RouteComponent() {
           </Tabs>
         </Scroller>
       </div>
+      <NoPlayerAlertDialog
+        open={noPlayerAlertDialogOpen}
+        setOpen={setNoPlayerAlertDialogOpen}
+        onConfirm={() => handleCreateCampaign(form.getValues())}
+      />
     </main>
   );
 }

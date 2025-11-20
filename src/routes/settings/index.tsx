@@ -72,7 +72,7 @@ function RouteComponent() {
   return (
     <main className="page-wrapper flex flex-col items-center">
       {isLoading ? (
-        <div className="content-wrapper preview">
+        <div className="content-wrapper">
           <div className="flex items-center gap-2">
             <Loader />
             <p>Loading...</p>
@@ -80,13 +80,6 @@ function RouteComponent() {
         </div>
       ) : (
         <div className="content-wrapper gap-4 relative">
-          <Link
-            className="absolute top-4 left-4 flex items-center gap-2"
-            to="/"
-          >
-            <IconArrowLeft className="size-4" />
-            Back
-          </Link>
           <form
             onSubmit={form.handleSubmit(handleSave)}
             className="px-4 w-full"
