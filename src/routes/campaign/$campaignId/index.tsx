@@ -16,6 +16,8 @@ import {
   TooltipTrigger,
 } from "~/components/ui/tooltip";
 import { isEmpty } from "~/lib/utils";
+import { CampaignPartyTable } from "~/routes/campaign/$campaignId/-components/campaign-party-table";
+import { CampaignSessionTable } from "~/routes/campaign/$campaignId/-components/campaign-session-table";
 import { CreateSessionDialog } from "~/routes/campaign/-components/create-session-dialog";
 import campaignsCollection from "~/server/collections/campaigns";
 import { usePlayers } from "~/server/collections/players";
@@ -67,83 +69,13 @@ function RouteComponent() {
                     ({campaign.players.length})
                   </span>
                 </h2>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Player</TableHead>
-                      <TableHead>Character</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell>{campaign?.dmName}</TableCell>
-                      <TableCell className="align-middle">
-                        <Badge
-                          variant="outline"
-                          className="bg-orange-100 dark:bg-orange-900 -translate-y-px"
-                        >
-                          Dungeon Master
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                    {campaign?.players.map((player) => (
-                      <TableRow key={player.id}>
-                        <TableCell>{player.playerName}</TableCell>
-                        <TableCell>{player.characterName}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                <CampaignPartyTable campaign={campaign} />
               </div>
             )}
           </section>
           <section>
             <h2 className="px-4 mb-2 font-medium">Sessions</h2>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-10">No.</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Date</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {sessions && sessions.length > 0 ? (
-                  sessions.map((session) => (
-                    <TableRow key={session.id}>
-                      <TableCell>
-                        {campaign?.id ? session.number : "-"}
-                      </TableCell>
-                      <TableCell>
-                        <Link
-                          disabled={!campaign?.id}
-                          to={`/campaign/$campaignId/$sessionId`}
-                          params={{
-                            campaignId: campaign?.id ?? "",
-                            sessionId: session.id,
-                          }}
-                          className="hover:underline"
-                        >
-                          {session.name ?? "-"}
-                        </Link>
-                      </TableCell>
-                      <TableCell>
-                        {format(session.createdAt, "d MMM, yyyy")}
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={3}
-                      className="w-full text-center text-muted-foreground"
-                    >
-                      No sessions yet
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+            <CampaignSessionTable sessions={sessions} />
             <CreateSessionDialog />
           </section>
         </Scroller>
