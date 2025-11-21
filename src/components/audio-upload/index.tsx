@@ -1,3 +1,4 @@
+import { useLoaderData } from "@tanstack/react-router";
 import {
   IconArrowOutOfBox,
   IconCelebrate,
@@ -33,6 +34,8 @@ import {
   getTokenCount,
   saveFileWithPrompt,
 } from "~/lib/utils";
+import { Route } from "~/routes/campaign/$campaignId/$sessionId";
+import sessionsCollection from "~/server/collections/sessions";
 
 export function AudioUpload() {
   const [files, setFiles] = useState<File[]>([]);
@@ -40,6 +43,7 @@ export function AudioUpload() {
   const [status, setStatus] = useAtom(statusAtom);
   const setProcessingFile = useSetAtom(processingFileAtom);
   const setTranscriptStats = useSetAtom(transcriptStatsAtom);
+  const { session } = useLoaderData({ from: Route.id });
 
   const onFileReject = useCallback((_file: File, message: string) => {
     toast.error(message, {
@@ -47,12 +51,39 @@ export function AudioUpload() {
     });
   }, []);
 
+  const getAudioDuration = (file: File): Promise<number> => {
+    return new Promise((resolve, reject) => {
+      const audio = new Audio();
+      const url = URL.createObjectURL(file);
+
+      audio.addEventListener("loadedmetadata", () => {
+        URL.revokeObjectURL(url);
+        resolve(audio.duration);
+      });
+
+      audio.addEventListener("error", () => {
+        URL.revokeObjectURL(url);
+        reject(new Error("Failed to load audio metadata"));
+      });
+
+      audio.src = url;
+    });
+  };
+
   async function handleTranscribe() {
+    if (!session) {
+      toast.error("Session not found");
+      return;
+    }
+
     setIsLoading(true);
     try {
       for (const file of files) {
         setStatus((prev) => ({ ...prev, transcribe: "loading" }));
         setProcessingFile(file.name);
+
+        const duration = await getAudioDuration(file);
+
         const transcription = await transcribeAudio(file, (error) => {
           setStatus((prev) => ({ ...prev, transcribe: "error" }));
           setProcessingFile(error.message);
@@ -76,6 +107,13 @@ export function AudioUpload() {
             await saveFileWithPrompt(
               new File([notes], `${timestamp} - notes.md`)
             );
+
+            sessionsCollection.update(session.id, (draft) => {
+              ((draft.duration = duration),
+                (draft.wordCount = wordCount),
+                (draft.noteWordCount = notes.length));
+            });
+
             setStatus((prev) => ({ ...prev, cleanUp: "success" }));
           } else {
             setStatus((prev) => ({ ...prev, generateNotes: "error" }));

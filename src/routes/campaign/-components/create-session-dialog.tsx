@@ -30,7 +30,7 @@ const formSchema = z.object({
 
 export function CreateSessionDialog() {
   const { campaign } = useLoaderData({ from: Route.id });
-  const { data: sessions } = useSessions(campaign?.id);
+  console.log("🚀 ~ CreateSessionDialog ~ campaign:", campaign);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -52,11 +52,14 @@ export function CreateSessionDialog() {
       campaignId: campaign?.id,
       name: values.name,
       date: values.date,
-      number: sessions.length + 1,
+      number: campaign.sessions.length + 1,
+      duration: 0,
+      filePath: "", // TODO: Implement file path
+      wordCount: null,
+      noteWordCount: null,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     });
-    console.log("🚀 ~ handleCreateSession ~ session:", session);
 
     navigate({
       to: "/campaign/$campaignId/$sessionId",
@@ -83,7 +86,9 @@ export function CreateSessionDialog() {
         >
           <DialogHeader className="text-left">
             <DialogTitle className="flex items-center gap-2">
-              <Badge variant="outline">#{sessions.length + 1}</Badge>
+              {campaign?.sessions && (
+                <Badge variant="outline">#{campaign.sessions.length + 1}</Badge>
+              )}
               Create Session
             </DialogTitle>
             <DialogDescription>

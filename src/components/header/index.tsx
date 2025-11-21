@@ -94,7 +94,7 @@ export function Header() {
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
                 </>
-              )}{" "}
+              )}
               <DropdownMenuGroup>
                 <DropdownMenuItem>Edit Campaign</DropdownMenuItem>
                 <DropdownMenuItem>Delete Campaign</DropdownMenuItem>
@@ -135,12 +135,14 @@ export function Header() {
           </Link>
         </div>
       </div>
-      <p className="font-semibold text-pink-500 select-none">
-        Loremonger{" "}
-        <span className="text-muted-foreground font-normal">
-          {packageJson.version}
-        </span>
-      </p>
+      <Link to="/">
+        <p className="font-semibold text-pink-500 select-none">
+          Loremonger{" "}
+          <span className="text-muted-foreground font-normal">
+            {packageJson.version}
+          </span>
+        </p>
+      </Link>
     </header>
   );
 }

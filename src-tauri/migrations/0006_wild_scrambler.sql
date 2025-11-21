@@ -1,1 +1,0 @@
-ALTER TABLE `sessions` ADD `date` text NOT NULL;

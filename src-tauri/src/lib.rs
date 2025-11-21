@@ -1,6 +1,7 @@
 use std::fs;
 use tauri::Manager;
 mod drizzle_proxy;
+mod audio_processor;
 include!(concat!(env!("OUT_DIR"), "/generated_migrations.rs"));
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -20,7 +21,6 @@ pub fn run() {
                 .app_data_dir()
                 .expect("could not resolve app data path");
 
-            // Ensure the directory exists before creating the salt file or database file
             fs::create_dir_all(&app_data_dir).expect("failed to create app data directory");
 
             let salt_path = app_data_dir.join("salt.txt");
@@ -29,7 +29,10 @@ pub fn run() {
             Ok(())
         })
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![drizzle_proxy::run_sql])
+        .invoke_handler(tauri::generate_handler![
+            drizzle_proxy::run_sql,
+            audio_processor::process_audio_files
+            ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

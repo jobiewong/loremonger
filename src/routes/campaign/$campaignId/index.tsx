@@ -1,15 +1,7 @@
-import { createFileRoute, Link, useLoaderData } from "@tanstack/react-router";
+import { createFileRoute, useLoaderData } from "@tanstack/react-router";
 import { format } from "date-fns";
 import { Badge } from "~/components/ui/badge";
 import { Scroller } from "~/components/ui/scroller";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "~/components/ui/table";
 import {
   Tooltip,
   TooltipContent,
@@ -20,7 +12,6 @@ import { CampaignPartyTable } from "~/routes/campaign/$campaignId/-components/ca
 import { CampaignSessionTable } from "~/routes/campaign/$campaignId/-components/campaign-session-table";
 import { CreateSessionDialog } from "~/routes/campaign/-components/create-session-dialog";
 import campaignsCollection from "~/server/collections/campaigns";
-import { usePlayers } from "~/server/collections/players";
 import { useSessions } from "~/server/collections/sessions";
 
 export const Route = createFileRoute("/campaign/$campaignId/")({
@@ -74,7 +65,12 @@ function RouteComponent() {
             )}
           </section>
           <section>
-            <h2 className="px-4 mb-2 font-medium">Sessions</h2>
+            <h2 className="px-4 mb-2 font-medium">
+              Sessions
+              <span className="text-muted-foreground">
+                ({sessions?.length})
+              </span>
+            </h2>
             <CampaignSessionTable sessions={sessions} />
             <CreateSessionDialog />
           </section>

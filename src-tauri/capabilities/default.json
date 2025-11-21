@@ -10,8 +10,20 @@
     "dialog:default",
     "fs:default",
     "fs:allow-create",
-    "fs:allow-write-file",
+    {
+      "identifier": "fs:allow-write-file",
+      "allow": [
+        {
+          "path": "$APPDATA/**"
+        },
+        {
+          "path": "$TEMP/**"
+        }
+      ]
+    },
     "fs:allow-write-text-file",
+    "fs:allow-read-file",
+    "fs:allow-remove",
     "sql:default",
     "sql:allow-load",
     "sql:allow-execute",

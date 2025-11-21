@@ -42,10 +42,10 @@ export const sessions = sqliteTable("sessions", {
   campaignId: text("campaign_id").references(() => campaigns.id),
   number: integer("number").notNull(),
   name: text("name"),
-  duration: integer("duration").notNull(),
+  duration: integer("duration").notNull().default(0),
   wordCount: integer("word_count"),
   noteWordCount: integer("note_word_count"),
-  filePath: text("file_path").notNull(),
+  filePath: text("file_path").notNull().default(""),
   date: text("date").notNull(),
   createdAt: text("created_at")
     .default(sql`CURRENT_TIMESTAMP`)

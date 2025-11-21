@@ -142,38 +142,3 @@ export function PartyMembersForm({
     </form>
   );
 }
-
-function PartyMemberItem({
-  member,
-  setPartyMembers,
-}: {
-  member: z.infer<typeof partyMembersSchema>;
-  setPartyMembers: Setter<z.infer<typeof partyMembersSchema>[]>;
-}) {
-  return (
-    <li
-      className="text-sm flex items-center justify-between pl-4"
-      key={member.id}
-    >
-      <div className="flex flex-col gap-1">
-        <p className="font-bold">
-          {member.characterName}
-          <Badge variant="outline" className="ml-2 text-xs">
-            {member.playerName}
-          </Badge>
-        </p>
-      </div>
-      <Button
-        variant="ghost"
-        size="icon"
-        type="button"
-        className="h-fit p-2"
-        onClick={() =>
-          setPartyMembers((prev) => prev.filter((m) => m.id !== member.id))
-        }
-      >
-        <IconCrossMedium />
-      </Button>
-    </li>
-  );
-}
