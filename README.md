@@ -8,11 +8,9 @@ This template should help get you started developing with Tauri, React and Types
 
 ## Todo
 
-- [ ] Header: edit and delete campaign
+- [ ] Header: edit campaign
 - [ ] Header: edit and delete session
-- [ ] Detect if mmpeg is installed and give option to download it if not
-- [ ] Progress Component: add stiching step
-- [ ] Progress Component: change to log-style table?
-- [ ] Save files in app directory on process
+- [ ] Detect if fmmpeg is installed and give option to download it if not
 - [ ] Save outputted notes in configured directory with naming conventions
 - [ ] Docs: write README
+- [ ] Refactor: audio-upload component

@@ -292,3 +292,9 @@
     @apply w-[calc(100%+2px)] -translate-x-px;
   }
 }
+
+.dots-background {
+  background:
+    radial-gradient(#777 0.5px, transparent 1px) 0 0/3px 3px,
+    var(--background);
+}

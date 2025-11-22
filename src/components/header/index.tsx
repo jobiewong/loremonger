@@ -1,7 +1,9 @@
 import { Link, useMatches } from "@tanstack/react-router";
 import { useTheme } from "next-themes";
+import { useState } from "react";
 import packageJson from "~/../package.json";
 import { DeleteCampaign } from "~/components/header/delete-campaign";
+import { EditCampaignDialog } from "~/components/header/edit-campaign-dialog";
 import { TimeAgo } from "~/components/time-ago";
 import {
   DropdownMenu,
@@ -23,10 +25,10 @@ export function Header() {
   const { theme, setTheme } = useTheme();
   const { data: campaigns } = useCampaigns();
   const matches = useMatches();
+  const [editCampaignDialogOpen, setEditCampaignDialogOpen] = useState(false);
   const isOnCampaignPage = matches.some(
     (match) => match.routeId === "/campaign/$campaignId/"
   );
-  console.log("🚀 ~ Header ~ isOnCampaignPage:", isOnCampaignPage);
   const isOnSessionPage = matches.some(
     (match) => match.routeId === "/campaign/$campaignId/$sessionId/"
   );
@@ -99,7 +101,11 @@ export function Header() {
                   </>
                 )}
                 <DropdownMenuGroup>
-                  <DropdownMenuItem>Edit Campaign</DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => setEditCampaignDialogOpen(true)}
+                  >
+                    Edit Campaign
+                  </DropdownMenuItem>
                   <DeleteCampaign />
                 </DropdownMenuGroup>
               </DropdownMenuContent>
@@ -147,6 +153,10 @@ export function Header() {
           </span>
         </p>
       </Link>
+      <EditCampaignDialog
+        open={editCampaignDialogOpen}
+        onOpenChange={setEditCampaignDialogOpen}
+      />
     </header>
   );
 }

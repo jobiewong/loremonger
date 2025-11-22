@@ -14,7 +14,9 @@ import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { Progress, progressLogsAtom } from "~/components/audio-upload/atoms";
 import { ProgressIndicator } from "~/components/audio-upload/progress-indicator";
+import { DotsPattern } from "~/components/patterns/dots";
 import { Stopwatch } from "~/components/stopwatch";
+import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
   FileUpload,
@@ -327,21 +329,26 @@ export function AudioUpload() {
         </Button>
       </motion.div>
       <ProgressIndicator isLoading={isLoading} />
-      {/* <div className="h-[38px] w-full relative">
+      <div className="h-[38px] w-full relative">
         <AnimatePresence mode="popLayout">
-          {status.cleanUp === "success" ? (
+          {!isLoading &&
+          progressLogs.length > 0 &&
+          progressLogs[progressLogs.length - 1].tag === "done" ? (
             <motion.div
               key="done-message"
               initial={{ y: -30 }}
               animate={{ y: 0 }}
               exit={{ y: -30 }}
-              className="offset-border absolute flex items-center gap-2 justify-center top-0 left-0 border text-center text-sm p-2 border-border"
+              className="offset-border absolute flex items-center gap-2 justify-center top-0 left-0 border text-center text-sm p-2 border-border h-30"
             >
-              <IconCelebrate className="size-4 text-accent-foreground" /> Done
+              <div className=" absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                <Badge className="bg-green-700 text-white">Success</Badge>
+              </div>
+              <DotsPattern />
             </motion.div>
           ) : null}
         </AnimatePresence>
-      </div> */}
+      </div>
     </div>
   );
 }

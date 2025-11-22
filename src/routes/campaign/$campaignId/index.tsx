@@ -31,7 +31,34 @@ function RouteComponent() {
       <div className="content-wrapper overflow-hidden justify-start! items-start!">
         <Scroller className="size-full overflow-x-hidden py-8 space-y-6">
           <section className="border-b pb-4 px-4 w-full">
-            <h1 className="text-2xl font-bold">{campaign?.name}</h1>
+            <h1 className="text-2xl font-bold select-none">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>{campaign?.name}</span>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="space-y-2">
+                  <div>
+                    {" "}
+                    <p className="font-medium">Outputs to:</p>
+                    <pre>
+                      {isEmpty(campaign?.outputDirectory)
+                        ? "Default"
+                        : campaign?.outputDirectory}
+                    </pre>
+                  </div>
+                  <div>
+                    {" "}
+                    <p className="font-medium">Naming Convention:</p>
+                    <pre>
+                      {isEmpty(campaign?.namingConvention)
+                        ? `{currentDate}-{currentTime}_notes.md`
+                        : campaign?.namingConvention}
+                    </pre>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </h1>
+
             <div className="flex items-center gap-1.5">
               <Tooltip>
                 <TooltipTrigger>

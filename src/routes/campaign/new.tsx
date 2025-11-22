@@ -1,7 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { createInsertSchema } from "drizzle-zod";
-import { useState } from "react";
+import {
+  createFileRoute,
+  useLoaderData,
+  useNavigate,
+} from "@tanstack/react-router";
+import { documentDir } from "@tauri-apps/api/path";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod/v4";
@@ -17,6 +21,10 @@ import playersCollection from "~/server/collections/players";
 
 export const Route = createFileRoute("/campaign/new")({
   component: RouteComponent,
+  loader: async () => {
+    const documentsDir = await documentDir();
+    return { documentsDir };
+  },
 });
 
 export const campaignDetailsSchema = z.object({
@@ -33,16 +41,20 @@ export const partyMembersSchema = z.object({
 });
 
 function RouteComponent() {
+  const { documentsDir } = useLoaderData({ from: Route.id });
   const [partyMembers, setPartyMembers] = useState<
     z.infer<typeof partyMembersSchema>[]
   >([]);
   const navigate = useNavigate();
   const [noPlayerAlertDialogOpen, setNoPlayerAlertDialogOpen] = useState(false);
+
   const form = useForm<z.infer<typeof campaignDetailsSchema>>({
     resolver: zodResolver(campaignDetailsSchema),
     defaultValues: {
       name: "",
       dmName: "",
+      outputDirectory: documentsDir,
+      namingConvention: "{currentDate}-{currentTime}_notes.md",
     },
   });
 
