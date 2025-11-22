@@ -75,6 +75,7 @@ export async function saveFileWithPrompt(file: File) {
     const fileRef = await create(path);
     await fileRef.write(content);
     await fileRef.close();
+    return path;
   }
 }
 

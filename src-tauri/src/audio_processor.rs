@@ -10,7 +10,6 @@ pub struct ProcessAudioRequest {
     pub session_id: String,
 }
 
-// Get the path to the bundled FFmpeg binary
 fn get_ffmpeg_path(app: &AppHandle) -> Result<PathBuf, String> {
     let resource_dir = app
         .path()
@@ -75,8 +74,8 @@ pub async fn process_audio_files(
     std::fs::create_dir_all(&temp_dir)
         .map_err(|e| format!("Failed to create temp directory: {}", e))?;
     
-    // 1. Convert all videos to audio, keep audio files as-is
-    let mut audio_files = Vec::new();
+    // 1. Convert all videos to audio, normalize all audio files to common format
+    let mut normalized_audio_files = Vec::new();
     for (index, input_path) in request.file_paths.iter().enumerate() {
         let input_path = PathBuf::from(input_path);
         let is_video = is_video_file(&input_path);
@@ -88,24 +87,26 @@ pub async fn process_audio_files(
                 .map_err(|e| format!("Failed to convert video to audio: {}", e))?;
             temp_audio
         } else {
-            // Already audio, use as-is
             input_path
         };
         
-        audio_files.push(audio_path);
+        // Normalize all audio files to a common format for consistent concatenation
+        let normalized_path = temp_dir.join(format!("normalized_{}.mp3", index));
+        normalize_audio_file(&ffmpeg_path, &audio_path, &normalized_path)
+            .map_err(|e| format!("Failed to normalize audio file: {}", e))?;
+        
+        normalized_audio_files.push(normalized_path);
     }
     
-    // 2. Concatenate all audio files
-    if audio_files.len() == 1 {
-        // Copy to output if only single file
-        std::fs::copy(&audio_files[0], &output_path)
+    // 2. Concatenate all normalized audio files
+    if normalized_audio_files.len() == 1 {
+        std::fs::copy(&normalized_audio_files[0], &output_path)
             .map_err(|e| format!("Failed to copy file: {}", e))?;
     } else {
-        concatenate_audio_files(&ffmpeg_path, &audio_files, &output_path)
+        concatenate_audio_files(&ffmpeg_path, &normalized_audio_files, &output_path)
             .map_err(|e| format!("Failed to concatenate audio: {}", e))?;
     }
     
-    // Cleanup temp directory
     let _ = std::fs::remove_dir_all(&temp_dir);
     
     Ok(output_path.to_string_lossy().to_string())
@@ -166,6 +167,55 @@ fn convert_video_to_audio(
     }
 }
 
+fn normalize_audio_file(
+    ffmpeg_path: &Path,
+    input: &Path,
+    output: &Path,
+) -> Result<(), String> {
+    let output_str = output
+        .to_str()
+        .ok_or("Invalid output path")?;
+    
+    let input_str = input
+        .to_str()
+        .ok_or("Invalid input path")?;
+    
+    let ffmpeg_str = ffmpeg_path
+        .to_str()
+        .ok_or("Invalid FFmpeg path")?;
+    
+    // Normalize audio to mp3
+    // - Sample rate: 44100 Hz
+    // - Channels: Stereo
+    // - Bitrate: 192k
+    // - Codec: libmp3lame
+    let result = Command::new(ffmpeg_str)
+        .args([
+            "-i", input_str,
+            "-vn",                    // No video
+            "-acodec", "libmp3lame",  // MP3 codec
+            "-ar", "44100",           // Sample rate
+            "-ac", "2",               // Stereo
+            "-b:a", "192k",           // Audio bitrate
+            "-y",                     // Overwrite output
+            output_str,
+        ])
+        .output();
+    
+    match result {
+        Ok(output) => {
+            if !output.status.success() {
+                let stderr = String::from_utf8_lossy(&output.stderr);
+                return Err(format!("FFmpeg normalization failed: {}", stderr));
+            }
+            Ok(())
+        }
+        Err(e) => {
+            Err(format!("Failed to run FFmpeg: {}", e))
+        }
+    }
+}
+
 fn concatenate_audio_files(
     ffmpeg_path: &Path,
     inputs: &[PathBuf],
@@ -175,14 +225,12 @@ fn concatenate_audio_files(
         return Err("No input files provided".to_string());
     }
     
-    // Create a file list for FFmpeg concat
     let temp_dir = output
         .parent()
         .ok_or("Invalid output path")?;
     
     let concat_list = temp_dir.join("concat_list.txt");
     
-    // Write concat list file
     let list_content: String = inputs
         .iter()
         .map(|p| {

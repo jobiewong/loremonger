@@ -1,127 +1,113 @@
-import { IconCircleCheck, IconCircleX } from "central-icons";
+import { format } from "date-fns";
 import { useAtomValue } from "jotai";
 import { AnimatePresence, motion } from "motion/react";
-import {
-  processingFileAtom,
-  Status,
-  statusAtom,
-  transcriptStatsAtom,
-} from "~/components/audio-upload/atoms";
+import { Progress, progressLogsAtom } from "~/components/audio-upload/atoms";
 import { Loader } from "~/components/loader";
-import { Stopwatch } from "~/components/stopwatch";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "~/components/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "~/components/ui/tooltip";
 import { cn } from "~/lib/utils";
 
 export function ProgressIndicator({ isLoading }: { isLoading: boolean }) {
-  const status = useAtomValue(statusAtom);
-  const processingFile = useAtomValue(processingFileAtom);
-  const transcriptStats = useAtomValue(transcriptStatsAtom);
+  const progressLogs = useAtomValue(progressLogsAtom);
+
   return (
     <AnimatePresence mode="popLayout">
-      {isLoading ? (
+      {isLoading || progressLogs.length > 0 ? (
         <motion.div
           key="progress-indicator"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
-          className="border offset-border border-border divide-y [&>div]:p-2 [&>div]:text-sm"
+          className="offset-border"
         >
-          <div className="flex items-center gap-4 justify-between">
-            Transcribing
-            <AnimatePresence>
-              {processingFile ? (
-                <motion.div
-                  key={processingFile}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className={cn(
-                    "text-sm text-muted-foreground truncate flex-1",
-                    status.transcribe === "error" &&
-                      "text-red-600 dark:text-red-500"
-                  )}
-                >
-                  {processingFile}
-                </motion.div>
-              ) : null}
-            </AnimatePresence>
-            <ProgressIndicatorInfo
-              status={status.transcribe}
-              name="transcribe"
-            />
-          </div>
-          <div
-            className={cn(
-              "opacity-30 transition-opacity duration-300 ease-snappy flex items-center gap-4 justify-between",
-              status.generateNotes !== "idle" && "opacity-100"
-            )}
-          >
-            Generating notes
-            {transcriptStats ? (
-              <motion.div
-                key={transcriptStats.wordCount}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className={cn(
-                  "text-sm text-muted-foreground truncate flex-1",
-                  status.transcribe === "error" &&
-                    "text-red-600 dark:text-red-500"
-                )}
-              >
-                <span>{transcriptStats.wordCount} words</span>,{" "}
-                <span>{transcriptStats.tokens} tokens</span>,{" "}
-                <span>${transcriptStats.cost.toFixed(6)}</span>
-              </motion.div>
-            ) : null}
-            <ProgressIndicatorInfo
-              status={status.generateNotes}
-              name="generateNotes"
-            />
-          </div>
-          <div
-            className={cn(
-              "opacity-30 transition-opacity duration-300 ease-snappy flex items-center gap-4 justify-between",
-              status.cleanUp !== "idle" && "opacity-100"
-            )}
-          >
-            Exporting
-            <ProgressIndicatorInfo status={status.cleanUp} name="cleanUp" />
-          </div>
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-accent">
+                <TableHead className="w-[100px]">Timestamp</TableHead>
+                <TableHead className="w-[124px]">Tag</TableHead>
+                <TableHead>Message</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {progressLogs.map((log, ci) => (
+                <LogRow
+                  key={`${log.timestamp.toISOString()} ${log.message}`}
+                  log={log}
+                  isLoading={isLoading}
+                  isLast={
+                    progressLogs[progressLogs.length - 1].message ===
+                    log.message
+                  }
+                />
+              ))}
+            </TableBody>
+          </Table>
         </motion.div>
       ) : null}
     </AnimatePresence>
   );
 }
 
-function ProgressIndicatorInfo({
-  status,
-  name,
+function LogRow({
+  log,
+  isLast,
+  isLoading,
 }: {
-  status: Status;
-  name: string;
+  log: Progress;
+  isLast: boolean;
+  isLoading: boolean;
 }) {
   return (
-    <div className="flex items-center gap-2">
-      {status !== "idle" && (
-        <Stopwatch isPaused={status === "success" || status === "error"} />
-      )}
-      <AnimatePresence mode="popLayout">
-        <motion.div
-          key={`${status}-${name}`}
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.5 }}
-          className="inline-flex items-center justify-center border border-transparent"
-        >
-          {status === "loading" && <Loader />}
-          {status === "success" && (
-            <IconCircleCheck className="text-green-500 size-4 dark:text-green-600" />
-          )}
-          {status === "error" && (
-            <IconCircleX className="text-red-600 size-4 dark:text-red-500" />
-          )}
-        </motion.div>
-      </AnimatePresence>
-    </div>
+    <MotionTableRow
+      key={log.timestamp.toISOString()}
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{
+        duration: 0.3,
+        type: "spring",
+        bounce: 0,
+      }}
+      className="hover:bg-background/50"
+    >
+      <TableCell>{format(log.timestamp, "HH:mm:ss")}</TableCell>
+      <TableCell
+        className={cn(
+          "uppercase",
+          log.status === "error" && "text-red-500",
+          log.tag === "done" && "text-green-500"
+        )}
+      >
+        {log.tag}
+      </TableCell>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <TableCell className="flex items-center justify-between gap-3 min-w-0">
+            <div className="flex items-center gap-1 min-w-0 flex-1">
+              <span className="truncate flex-1">{log.message}</span>
+              {isLast && isLoading && (
+                <Loader className="size-3 animate-spin shrink-0" />
+              )}
+            </div>
+          </TableCell>
+        </TooltipTrigger>
+        <TooltipContent className="max-w-sm" disabled={log.message.length < 40}>
+          {log.message}
+        </TooltipContent>
+      </Tooltip>
+    </MotionTableRow>
   );
 }
+
+const MotionTableRow = motion.create(TableRow);

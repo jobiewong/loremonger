@@ -22,7 +22,14 @@
       ]
     },
     "fs:allow-write-text-file",
-    "fs:allow-read-file",
+    {
+      "identifier": "fs:allow-read-file",
+      "allow": [
+        {
+          "path": "$APPDATA/**"
+        }
+      ]
+    },
     "fs:allow-remove",
     "sql:default",
     "sql:allow-load",

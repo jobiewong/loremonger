@@ -10,10 +10,11 @@ TimeAgo.addDefaultLocale(en);
 const RootLayout = () => (
   <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
     <AppBackground />
-    <Header />
     <Toaster position="bottom-center" />
-    <Outlet />
-
+    <div className="size-full relative z-1 isolate">
+      <Header />
+      <Outlet />
+    </div>
     {/* <TanStackRouterDevtools /> */}
   </ThemeProvider>
 );

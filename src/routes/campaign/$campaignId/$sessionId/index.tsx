@@ -20,7 +20,7 @@ function RouteComponent() {
   const { campaign, session } = useLoaderData({ from: Route.id });
   return (
     <main className="page-wrapper flex flex-col items-center">
-      <div className="content-wrapper justify-start! pt-4 items-start!">
+      <div className="content-wrapper justify-start! pt-4 pb-8 items-start!">
         <Link
           to="/campaign/$campaignId"
           params={{

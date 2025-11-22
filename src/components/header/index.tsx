@@ -27,7 +27,7 @@ export function Header() {
   );
 
   return (
-    <header className="h-(--header-height) flex items-center justify-between border-b border-muted-border px-4 bg-background">
+    <header className="h-(--header-height) sticky top-0 z-10 flex items-center justify-between border-b border-muted-border px-4 bg-background">
       <div>
         <div className="flex items-center gap-1 -ml-2">
           <DropdownMenu>

@@ -263,12 +263,14 @@
   * {
     @apply border-border-muted outline-ring/50;
   }
+
+  body {
+    background-color: var(--background);
+  }
+
   html,
   body {
     overscroll-behavior: none;
-  }
-
-  body {
     @apply text-foreground;
   }
 }
@@ -283,7 +285,7 @@
   }
 
   .content-wrapper {
-    @apply border-x border-border-muted size-full flex-1 max-w-lg lg:max-w-2xl flex flex-col items-center justify-center bg-muted;
+    @apply border-x border-border-muted size-full flex-1 max-w-lg md:max-w-2xl flex flex-col items-center justify-center bg-muted;
   }
 
   .offset-border {

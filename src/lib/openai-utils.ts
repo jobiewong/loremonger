@@ -41,7 +41,8 @@ export async function getAIProvider() {
 
 export async function generateNotes(
   transcript: string,
-  characters: Player[],
+  dmName: string,
+  players: Player[],
   debug: boolean = false
 ) {
   const aiClient = await getAIProvider();
@@ -55,14 +56,13 @@ export async function generateNotes(
     const systemPrompt = `
   You are a helpful assistant that generates session notes for a Dungeons and Dragons game. Your goal is to capture the important details of the session. Write summary descriptions of characters and places in the session, as well as a timeline of events. Bear in mind that the transcript is a real-time transcription of the session, so it may contain some errors and typos on names. Try to correct the transcription where possible without making assumptions.
   The players consist of the following characters: 
-  ${characters
-    .filter((character) => character.type === "player")
-    .map((character) => `${character.name} (${character.playerName})`)
+  ${players
+    .map(
+      (player) => `${player.characterName} (played by: ${player.playerName})`
+    )
     .join("\n")}
-  The Dungeon Master(s) are ${characters
-    .filter((character) => character.type === "gm")
-    .map((character) => character.playerName)
-    .join(", ")}
+  The Dungeon Master name is ${dmName}.
+
   The notes should be in markdown format with bold/italic/table/list/quote formatting where appropriate. Do not include any other text than the notes. Use a neutral tone and keep it concise while retaining important details.
   The notes should include the following sections:
   # Session Notes: (date)

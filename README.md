@@ -10,7 +10,7 @@ This template should help get you started developing with Tauri, React and Types
 
 - [ ] Header: edit and delete campaign
 - [ ] Header: edit and delete session
-- [ ] Audio Upload: stitch files into a single audio file before processing
+- [ ] Detect if mmpeg is installed and give option to download it if not
 - [ ] Progress Component: add stiching step
 - [ ] Progress Component: change to log-style table?
 - [ ] Save files in app directory on process

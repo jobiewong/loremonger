@@ -1,4 +1,7 @@
 import { useLoaderData } from "@tanstack/react-router";
+import { invoke } from "@tauri-apps/api/core";
+import { appDataDir, tempDir } from "@tauri-apps/api/path";
+import { readFile, writeFile } from "@tauri-apps/plugin-fs";
 import {
   IconArrowOutOfBox,
   IconCelebrate,
@@ -9,12 +12,9 @@ import { useAtom, useSetAtom } from "jotai";
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
-import {
-  processingFileAtom,
-  statusAtom,
-  transcriptStatsAtom,
-} from "~/components/audio-upload/atoms";
+import { Progress, progressLogsAtom } from "~/components/audio-upload/atoms";
 import { ProgressIndicator } from "~/components/audio-upload/progress-indicator";
+import { Stopwatch } from "~/components/stopwatch";
 import { Button } from "~/components/ui/button";
 import {
   FileUpload,
@@ -40,10 +40,8 @@ import sessionsCollection from "~/server/collections/sessions";
 export function AudioUpload() {
   const [files, setFiles] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [status, setStatus] = useAtom(statusAtom);
-  const setProcessingFile = useSetAtom(processingFileAtom);
-  const setTranscriptStats = useSetAtom(transcriptStatsAtom);
-  const { session } = useLoaderData({ from: Route.id });
+  const [progressLogs, setProgressLogs] = useAtom(progressLogsAtom);
+  const { session, campaign } = useLoaderData({ from: Route.id });
 
   const onFileReject = useCallback((_file: File, message: string) => {
     toast.error(message, {
@@ -70,58 +68,200 @@ export function AudioUpload() {
     });
   };
 
+  function updateLogs(log: Progress) {
+    setProgressLogs((prev) => [...prev, log]);
+  }
+
   async function handleTranscribe() {
+    setProgressLogs([]);
     if (!session) {
-      toast.error("Session not found");
+      updateLogs({
+        timestamp: new Date(),
+        message: "Session not found",
+        tag: "init",
+        status: "error",
+      });
+      return;
+    }
+    if (!campaign) {
+      updateLogs({
+        timestamp: new Date(),
+        message: "Campaign not found",
+        tag: "init",
+        status: "error",
+      });
       return;
     }
 
     setIsLoading(true);
     try {
-      for (const file of files) {
-        setStatus((prev) => ({ ...prev, transcribe: "loading" }));
-        setProcessingFile(file.name);
-
-        const duration = await getAudioDuration(file);
-
-        const transcription = await transcribeAudio(file, (error) => {
-          setStatus((prev) => ({ ...prev, transcribe: "error" }));
-          setProcessingFile(error.message);
-          throw error;
+      updateLogs({
+        timestamp: new Date(),
+        message: "Preparing files",
+        tag: "prepare",
+      });
+      const tempDirPath = await tempDir();
+      const filePaths: string[] = [];
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const tempPath = `${tempDirPath}/${session.id}_${i}_${file.name.slice(0, 10)}`;
+        const arrayBuffer = await file.arrayBuffer();
+        await writeFile(tempPath, new Uint8Array(arrayBuffer));
+        updateLogs({
+          timestamp: new Date(),
+          message: `Saved ${file.name} to temp directory`,
+          tag: "prepare",
         });
-        setStatus((prev) => ({ ...prev, transcribe: "success" }));
-        if (transcription) {
-          setStatus((prev) => ({ ...prev, generateNotes: "loading" }));
-          const tokens = getTokenCount("gpt-5-nano", transcription.text);
-          const wordCount = transcription.text.split(" ").length;
-          const cost = getGpt5NanoCost(tokens);
-          setTranscriptStats({ tokens, wordCount, cost });
-          const notes = await generateNotes(transcription.text, [], true);
-          if (notes) {
-            setStatus((prev) => ({
-              ...prev,
-              generateNotes: "success",
-              cleanUp: "loading",
-            }));
-            const timestamp = getTimestampString();
-            await saveFileWithPrompt(
-              new File([notes], `${timestamp} - notes.md`)
-            );
+        filePaths.push(tempPath);
+      }
 
-            sessionsCollection.update(session.id, (draft) => {
-              ((draft.duration = duration),
-                (draft.wordCount = wordCount),
-                (draft.noteWordCount = notes.length));
-            });
+      setProgressLogs((prev) => [
+        ...prev,
+        {
+          timestamp: new Date(),
+          message: `Pre-processing uploaded files: ${files.length} files`,
+          tag: "pre-process",
+        },
+      ]);
 
-            setStatus((prev) => ({ ...prev, cleanUp: "success" }));
-          } else {
-            setStatus((prev) => ({ ...prev, generateNotes: "error" }));
-          }
+      const outputPath = await invoke<string>("process_audio_files", {
+        request: {
+          file_paths: filePaths,
+          output_filename: `/audio.mp3`,
+          session_id: session.id,
+        },
+      });
+
+      setProgressLogs((prev) => [
+        ...prev,
+        {
+          timestamp: new Date(),
+          message: `Processed files saved to ${outputPath}`,
+          tag: "pre-process",
+        },
+      ]);
+
+      const fileData = await readFile(outputPath);
+      const file = new File([fileData], "audio.mp3", { type: "audio/mpeg" });
+
+      const duration = await getAudioDuration(file);
+
+      updateLogs({
+        timestamp: new Date(),
+        message: `Transcribing audio: ${file.name}: ${duration.toFixed(2)}s`,
+        tag: "transcribe",
+      });
+
+      const transcription = await transcribeAudio(file, (error) => {
+        updateLogs({
+          timestamp: new Date(),
+          message: `Error transcribing ${file.name}`,
+          tag: "transcribe",
+          status: "error",
+        });
+        throw error;
+      });
+      updateLogs({
+        timestamp: new Date(),
+        message: `Transcribed finished: ${transcription?.text.length} characters`,
+        tag: "transcribe",
+      });
+      if (transcription) {
+        updateLogs({
+          timestamp: new Date(),
+          message: `Saving transcript to disk`,
+          tag: "transcribe",
+        });
+        const appPath = await appDataDir();
+        await writeFile(
+          `${appPath}/sessions/${session.id}/transcript.txt`,
+          new TextEncoder().encode(transcription.text)
+        );
+        updateLogs({
+          timestamp: new Date(),
+          message: `Transcript saved to disk: ${appPath}/sessions/${session.id}/transcript.txt`,
+          tag: "transcribe",
+        });
+
+        const tokens = getTokenCount("gpt-5-nano", transcription.text);
+        const wordCount = transcription.text.split(" ").length;
+        const cost = getGpt5NanoCost(tokens);
+        updateLogs({
+          timestamp: new Date(),
+          message: `Generating notes: ${tokens} tokens: ${wordCount} words: ~${cost.toFixed(6)} USD`,
+          tag: "generate",
+        });
+        const notes = await generateNotes(
+          transcription.text,
+          campaign?.dmName ?? "Unknown DM",
+          campaign?.players ?? [],
+          true // debug
+        );
+
+        if (notes) {
+          updateLogs({
+            timestamp: new Date(),
+            message: `Notes generated: ${notes.length} characters`,
+            tag: "generate",
+          });
+
+          updateLogs({
+            timestamp: new Date(),
+            message: `Saving notes to disk`,
+            tag: "clean-up",
+          });
+          const timestamp = getTimestampString();
+          const notesPath = await saveFileWithPrompt(
+            new File([notes], `${timestamp} - notes.md`)
+          );
+
+          updateLogs({
+            timestamp: new Date(),
+            message: `Notes saved to disk: ${notesPath}`,
+            tag: "clean-up",
+          });
+          updateLogs({
+            timestamp: new Date(),
+            message: `Updating session in database`,
+            tag: "clean-up",
+          });
+
+          sessionsCollection.update(session.id, (draft) => {
+            ((draft.duration = duration),
+              (draft.wordCount = wordCount),
+              (draft.noteWordCount = notes.length),
+              (draft.filePath = notesPath ?? ""),
+              (draft.updatedAt = new Date().toISOString()));
+          });
+
+          updateLogs({
+            timestamp: new Date(),
+            message: `Session updated in database`,
+            tag: "done",
+          });
+          setIsLoading(false);
+        } else {
+          updateLogs({
+            timestamp: new Date(),
+            message: `Error generating notes`,
+            tag: "generate-notes",
+            status: "error",
+          });
         }
       }
     } catch (error) {
       setIsLoading(false);
+      updateLogs({
+        timestamp: new Date(),
+        message:
+          error instanceof Error
+            ? error.message
+            : typeof error === "string"
+              ? error
+              : "An unexpected error occurred",
+        tag: "error",
+        status: "error",
+      });
       console.log("🚀 ~ handleTranscribe ~ error:", error);
     }
   }
@@ -137,7 +277,7 @@ export function AudioUpload() {
           accept="audio/*,video/*"
           multiple
         >
-          <FileUploadDropzone className="border border-border offset-border border-solid bg-background">
+          <FileUploadDropzone className="border border-border border-solid bg-background">
             <div className="flex flex-col items-center gap-1 text-center">
               <div className="flex items-center justify-center rounded-full border p-2.5">
                 <IconArrowOutOfBox className="text-accent-600" />
@@ -158,7 +298,6 @@ export function AudioUpload() {
               <MotionFileUploadItem
                 key={index}
                 value={file}
-                className="offset-border"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 10 }}
@@ -184,10 +323,11 @@ export function AudioUpload() {
         >
           <IconScript />
           Transcribe
+          {progressLogs.length > 0 && <Stopwatch isPaused={!isLoading} />}
         </Button>
       </motion.div>
       <ProgressIndicator isLoading={isLoading} />
-      <div className="h-[38px] w-full relative">
+      {/* <div className="h-[38px] w-full relative">
         <AnimatePresence mode="popLayout">
           {status.cleanUp === "success" ? (
             <motion.div
@@ -201,7 +341,7 @@ export function AudioUpload() {
             </motion.div>
           ) : null}
         </AnimatePresence>
-      </div>
+      </div> */}
     </div>
   );
 }
