@@ -8,6 +8,20 @@
       "when": 1763695519648,
       "tag": "0000_light_grim_reaper",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1763821047905,
+      "tag": "0001_great_the_enforcers",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1763821256510,
+      "tag": "0002_sudden_power_man",
+      "breakpoints": true
     }
   ]
 }

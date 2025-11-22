@@ -1,5 +1,5 @@
 import { relations, sql } from "drizzle-orm";
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const campaigns = sqliteTable("campaigns", {
   id: text("id").primaryKey(),
@@ -42,7 +42,7 @@ export const sessions = sqliteTable("sessions", {
   campaignId: text("campaign_id").references(() => campaigns.id),
   number: integer("number").notNull(),
   name: text("name"),
-  duration: integer("duration").notNull().default(0),
+  duration: real("duration").notNull().default(0),
   wordCount: integer("word_count"),
   noteWordCount: integer("note_word_count"),
   filePath: text("file_path").notNull().default(""),

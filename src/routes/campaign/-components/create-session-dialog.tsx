@@ -20,8 +20,7 @@ import { Field, FieldGroup, FieldLabel, FieldSet } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
 import { generateId } from "~/lib/utils";
 import { Route } from "~/routes/campaign/$campaignId";
-import sessionsCollection, { useSessions } from "~/server/collections/sessions";
-import { sessions } from "~/server/db/schema";
+import sessionsCollection from "~/server/collections/sessions";
 
 const formSchema = z.object({
   name: z.string(),
@@ -30,7 +29,6 @@ const formSchema = z.object({
 
 export function CreateSessionDialog() {
   const { campaign } = useLoaderData({ from: Route.id });
-  console.log("🚀 ~ CreateSessionDialog ~ campaign:", campaign);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {

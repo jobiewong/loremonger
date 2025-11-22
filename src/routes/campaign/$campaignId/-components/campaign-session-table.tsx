@@ -62,7 +62,9 @@ export function CampaignSessionTable({ sessions }: { sessions: Session[] }) {
                 </TooltipContent>
               </Tooltip>
               <TableCell>{format(session.createdAt, "d MMM, yyyy")}</TableCell>
-              <TableCell className="text-right">{session.duration}s</TableCell>
+              <TableCell className="text-right">
+                {session.duration ? session.duration.toFixed(2) : "-"}s
+              </TableCell>
               <TableCell className="w-6 px-0 text-right">
                 <Button
                   variant="ghost"

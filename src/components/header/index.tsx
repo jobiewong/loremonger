@@ -1,6 +1,7 @@
 import { Link, useMatches } from "@tanstack/react-router";
 import { useTheme } from "next-themes";
 import packageJson from "~/../package.json";
+import { DeleteCampaign } from "~/components/header/delete-campaign";
 import { TimeAgo } from "~/components/time-ago";
 import {
   DropdownMenu,
@@ -22,6 +23,10 @@ export function Header() {
   const { theme, setTheme } = useTheme();
   const { data: campaigns } = useCampaigns();
   const matches = useMatches();
+  const isOnCampaignPage = matches.some(
+    (match) => match.routeId === "/campaign/$campaignId/"
+  );
+  console.log("🚀 ~ Header ~ isOnCampaignPage:", isOnCampaignPage);
   const isOnSessionPage = matches.some(
     (match) => match.routeId === "/campaign/$campaignId/$sessionId/"
   );
@@ -76,31 +81,30 @@ export function Header() {
               <Link to="/settings">
                 <DropdownMenuItem>Settings</DropdownMenuItem>
               </Link>
-              {/* <Link to="/workbench">
-                <DropdownMenuItem>Workbench</DropdownMenuItem>
-              </Link> */}
             </DropdownMenuContent>
           </DropdownMenu>
-          <DropdownMenu>
-            <DropdownMenuTrigger className="text-sm font-medium hover:bg-muted px-2 py-0.5">
-              Edit
-            </DropdownMenuTrigger>
-            <DropdownMenuContent side="bottom" sideOffset={5} align="start">
-              {isOnSessionPage && (
-                <>
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem>Edit Session</DropdownMenuItem>
-                    <DropdownMenuItem>Delete Session</DropdownMenuItem>
-                  </DropdownMenuGroup>
-                  <DropdownMenuSeparator />
-                </>
-              )}
-              <DropdownMenuGroup>
-                <DropdownMenuItem>Edit Campaign</DropdownMenuItem>
-                <DropdownMenuItem>Delete Campaign</DropdownMenuItem>
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {(isOnCampaignPage || isOnSessionPage) && (
+            <DropdownMenu>
+              <DropdownMenuTrigger className="text-sm font-medium hover:bg-muted px-2 py-0.5">
+                Edit
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="bottom" sideOffset={5} align="start">
+                {isOnSessionPage && (
+                  <>
+                    <DropdownMenuGroup>
+                      <DropdownMenuItem>Edit Session</DropdownMenuItem>
+                      <DropdownMenuItem>Delete Session</DropdownMenuItem>
+                    </DropdownMenuGroup>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
+                <DropdownMenuGroup>
+                  <DropdownMenuItem>Edit Campaign</DropdownMenuItem>
+                  <DeleteCampaign />
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
           <DropdownMenu>
             <DropdownMenuTrigger className="text-sm font-medium hover:bg-muted px-2 py-0.5">
               View
