@@ -1,18 +1,18 @@
 import { useLoaderData } from "@tanstack/react-router";
 import { invoke } from "@tauri-apps/api/core";
 import { appDataDir, tempDir } from "@tauri-apps/api/path";
-import { readFile, writeFile } from "@tauri-apps/plugin-fs";
-import {
-  IconArrowOutOfBox,
-  IconCelebrate,
-  IconCrossSmall,
-  IconScript,
-} from "central-icons";
+import { mkdir, readFile, writeFile } from "@tauri-apps/plugin-fs";
+import { IconArrowOutOfBox, IconCrossSmall, IconScript } from "central-icons";
 import { useAtom, useSetAtom } from "jotai";
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
-import { Progress, progressLogsAtom } from "~/components/audio-upload/atoms";
+import {
+  isLoadingAtom,
+  isSuccessAtom,
+  Progress,
+  progressLogsAtom,
+} from "~/components/audio-upload/atoms";
 import { ProgressIndicator } from "~/components/audio-upload/progress-indicator";
 import { DotsPattern } from "~/components/patterns/dots";
 import { Stopwatch } from "~/components/stopwatch";
@@ -31,8 +31,9 @@ import {
 import { transcribeAudio } from "~/lib/el-labs-utils";
 import { generateNotes } from "~/lib/openai-utils";
 import {
+  generateFileName,
+  generateFilePath,
   getGpt5NanoCost,
-  getTimestampString,
   getTokenCount,
   saveFileWithPrompt,
 } from "~/lib/utils";
@@ -41,8 +42,9 @@ import sessionsCollection from "~/server/collections/sessions";
 
 export function AudioUpload() {
   const [files, setFiles] = useState<File[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useAtom(isLoadingAtom);
   const [progressLogs, setProgressLogs] = useAtom(progressLogsAtom);
+  const setIsSuccess = useSetAtom(isSuccessAtom);
   const { session, campaign } = useLoaderData({ from: Route.id });
 
   const onFileReject = useCallback((_file: File, message: string) => {
@@ -212,10 +214,26 @@ export function AudioUpload() {
             message: `Saving notes to disk`,
             tag: "clean-up",
           });
-          const timestamp = getTimestampString();
-          const notesPath = await saveFileWithPrompt(
-            new File([notes], `${timestamp} - notes.md`)
-          );
+          const fileName = generateFileName({
+            name: session.name,
+            number: session.number,
+            campaign,
+          });
+          const outputDirectory = await generateFilePath({
+            name: session.name,
+            number: session.number,
+            campaign,
+          });
+
+          let notesPath: string | undefined;
+
+          if (!outputDirectory) {
+            notesPath = await saveFileWithPrompt(new File([notes], fileName));
+          } else {
+            await mkdir(outputDirectory, { recursive: true });
+            notesPath = `${outputDirectory}/${fileName}`;
+            await writeFile(notesPath, new TextEncoder().encode(notes));
+          }
 
           updateLogs({
             timestamp: new Date(),
@@ -242,7 +260,10 @@ export function AudioUpload() {
             tag: "done",
           });
           setIsLoading(false);
+          setIsSuccess(true);
         } else {
+          setIsLoading(false);
+          setIsSuccess(false);
           updateLogs({
             timestamp: new Date(),
             message: `Error generating notes`,
@@ -253,6 +274,7 @@ export function AudioUpload() {
       }
     } catch (error) {
       setIsLoading(false);
+      setIsSuccess(false);
       updateLogs({
         timestamp: new Date(),
         message:
@@ -328,27 +350,25 @@ export function AudioUpload() {
           {progressLogs.length > 0 && <Stopwatch isPaused={!isLoading} />}
         </Button>
       </motion.div>
-      <ProgressIndicator isLoading={isLoading} />
-      <div className="h-[38px] w-full relative">
-        <AnimatePresence mode="popLayout">
-          {!isLoading &&
-          progressLogs.length > 0 &&
-          progressLogs[progressLogs.length - 1].tag === "done" ? (
-            <motion.div
-              key="done-message"
-              initial={{ y: -30 }}
-              animate={{ y: 0 }}
-              exit={{ y: -30 }}
-              className="offset-border absolute flex items-center gap-2 justify-center top-0 left-0 border text-center text-sm p-2 border-border h-30"
-            >
-              <div className=" absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                <Badge className="bg-green-700 text-white">Success</Badge>
-              </div>
-              <DotsPattern />
-            </motion.div>
-          ) : null}
-        </AnimatePresence>
-      </div>
+      <ProgressIndicator />
+      <AnimatePresence mode="popLayout">
+        {!isLoading &&
+        progressLogs.length > 0 &&
+        progressLogs[progressLogs.length - 1].tag === "done" ? (
+          <motion.div
+            key="done-message"
+            initial={{ y: -30 }}
+            animate={{ y: 0 }}
+            exit={{ y: -30 }}
+            className="offset-border relative flex items-center gap-2 justify-center border text-center text-sm p-2 border-border h-30"
+          >
+            <div className=" absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+              <Badge className="bg-green-700 text-white">Success</Badge>
+            </div>
+            <DotsPattern />
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
     </div>
   );
 }

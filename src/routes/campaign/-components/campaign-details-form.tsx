@@ -84,7 +84,24 @@ export function CampaignDetailsForm({
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor="outputDirectory">
-                Output Directory
+                <div className="flex items-center gap-2">
+                  Output Directory{" "}
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <IconSquareInfo className="size-4 opacity-60 hover:opacity-100" />
+                    </TooltipTrigger>
+                    <TooltipContent
+                      className="max-w-xs space-y-2"
+                      classNames={{
+                        arrow: "translate-y-[calc(50%-2px)]",
+                      }}
+                    >
+                      Determines the directory where session notes will be
+                      saved. If undefined, you will be prompted to select a
+                      directory every time you generate notes.
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
               </FieldLabel>
               <Input
                 {...field}

@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { eq, useLiveQuery } from "@tanstack/react-db";
 import { useMatches, useRouter } from "@tanstack/react-router";
 import { documentDir } from "@tauri-apps/api/path";
 import { IconSquareInfo } from "central-icons";
@@ -25,7 +26,9 @@ import {
   TooltipTrigger,
 } from "~/components/ui/tooltip";
 import { campaignDetailsSchema } from "~/routes/campaign/new";
-import campaignsCollection from "~/server/collections/campaigns";
+import campaignsCollection, {
+  useCampaign,
+} from "~/server/collections/campaigns";
 
 export function EditCampaignDialog({
   open,
@@ -38,44 +41,52 @@ export function EditCampaignDialog({
   const isOnCampaignPage = matches.find(
     (match) => match.routeId === "/campaign/$campaignId/"
   );
+  const isOnSessionPage = matches.find(
+    (match) => match.routeId === "/campaign/$campaignId/$sessionId/"
+  );
   const campaign = isOnCampaignPage?.loaderData?.campaign;
+  const session = isOnSessionPage?.loaderData?.session;
+  const { data: sessionCampaign } = useCampaign(session?.campaignId ?? "");
   const router = useRouter();
 
   const form = useForm<z.infer<typeof campaignDetailsSchema>>({
     resolver: zodResolver(campaignDetailsSchema),
     defaultValues: {
-      name: campaign?.name ?? "",
-      dmName: campaign?.dmName ?? "",
-      description: campaign?.description ?? "",
-      outputDirectory: campaign?.outputDirectory ?? "",
-      namingConvention: campaign?.namingConvention ?? "",
+      name: campaign?.name,
+      dmName: campaign?.dmName,
+      description: campaign?.description ?? undefined,
+      outputDirectory: campaign?.outputDirectory ?? undefined,
+      namingConvention: campaign?.namingConvention ?? undefined,
     },
   });
 
   useEffect(() => {
-    if (campaign) {
+    const campaignData = campaign ?? sessionCampaign;
+    if (campaignData) {
       form.reset({
-        name: campaign.name,
-        dmName: campaign.dmName,
-        description: campaign.description ?? "",
-        outputDirectory: campaign.outputDirectory ?? "",
-        namingConvention: campaign.namingConvention ?? "",
+        name: campaignData.name ?? "",
+        dmName: campaignData.dmName,
+        description: campaignData.description ?? "",
+        outputDirectory: campaignData.outputDirectory ?? "",
+        namingConvention: campaignData.namingConvention ?? "",
       });
     }
-  }, [campaign]);
+  }, [campaign, sessionCampaign]);
 
   function onSubmit(values: z.infer<typeof campaignDetailsSchema>) {
-    if (!campaign) {
+    const campaignId = campaign?.id ?? sessionCampaign?.id;
+    if (!campaignId) {
       toast.error("Campaign not found");
       return;
     }
 
-    campaignsCollection.update(campaign.id, (draft) => {
+    campaignsCollection.update(campaignId, (draft) => {
       draft.name = values.name;
       draft.dmName = values.dmName;
       draft.description = values.description || null;
       draft.outputDirectory = values.outputDirectory || null;
-      draft.namingConvention = values.namingConvention || null;
+      draft.namingConvention =
+        values.namingConvention ?? "{currentDate}-{currentTime}_notes.md";
       draft.updatedAt = new Date().toISOString();
     });
 
@@ -154,7 +165,24 @@ export function EditCampaignDialog({
                     htmlFor="edit-outputDirectory"
                     className="flex items-center justify-between"
                   >
-                    Output Directory
+                    <div className="flex items-center gap-2">
+                      Output Directory{" "}
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <IconSquareInfo className="size-4 opacity-60 hover:opacity-100" />
+                        </TooltipTrigger>
+                        <TooltipContent
+                          className="max-w-xs space-y-2"
+                          classNames={{
+                            arrow: "translate-y-[calc(50%-2px)]",
+                          }}
+                        >
+                          Determines the directory where session notes will be
+                          saved. If undefined, you will be prompted to select a
+                          directory every time you generate notes.
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
                     <button
                       type="button"
                       className="hover:underline text-xs text-muted-foreground cursor-pointer"

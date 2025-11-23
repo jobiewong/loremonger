@@ -12,7 +12,7 @@ import { z } from "zod/v4";
 
 import { Scroller } from "~/components/ui/scroller";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { generateId } from "~/lib/utils";
+import { generateId, isEmpty } from "~/lib/utils";
 import { CampaignDetailsForm } from "~/routes/campaign/-components/campaign-details-form";
 import { NoPlayerAlertDialog } from "~/routes/campaign/-components/no-player-alert-dialog";
 import { PartyMembersForm } from "~/routes/campaign/-components/party-members-form";
@@ -72,13 +72,14 @@ function RouteComponent() {
   ) {
     const id = generateId();
     const date = new Date().toISOString();
-    const documentsDir = await documentDir();
 
     campaignsCollection.insert({
       ...values,
       id,
       description: values.description ?? null,
-      outputDirectory: values.outputDirectory ?? documentsDir,
+      outputDirectory: isEmpty(values.outputDirectory)
+        ? null
+        : (values.outputDirectory ?? null),
       namingConvention:
         values.namingConvention ?? "{currentDate}-{currentTime}_notes.md",
       createdAt: date,

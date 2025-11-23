@@ -4,6 +4,7 @@ import { format } from "date-fns";
 import { AudioUpload } from "~/components/audio-upload";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import { ScrollToBottom } from "~/routes/campaign/$campaignId/-components/scroll-to-bottom";
 import campaignsCollection from "~/server/collections/campaigns";
 import sessionsCollection from "~/server/collections/sessions";
 
@@ -51,6 +52,7 @@ function RouteComponent() {
         <section className="w-full offset-border">
           <AudioUpload />
         </section>
+        <ScrollToBottom />
       </div>
     </main>
   );

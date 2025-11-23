@@ -1,5 +1,5 @@
 import { createFileRoute, useLoaderData } from "@tanstack/react-router";
-import { differenceInDays, format } from "date-fns";
+import { format } from "date-fns";
 import { TimeAgo } from "~/components/time-ago";
 import { Badge } from "~/components/ui/badge";
 import { Scroller } from "~/components/ui/scroller";

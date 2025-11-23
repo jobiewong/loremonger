@@ -8,7 +8,6 @@ import { twMerge } from "tailwind-merge";
 import { encoding_for_model, type TiktokenModel } from "tiktoken";
 import { v7 as uuidv7 } from "uuid";
 import { initStronghold } from "~/lib/stronghold";
-import { Campaign, Session } from "~/types";
 
 let strongholdStorePromise: Promise<Store> | null = null;
 
@@ -95,7 +94,22 @@ interface PartialSession {
   campaign: {
     name: string;
     namingConvention?: string;
+    outputDirectory?: string | null;
   };
+}
+
+export async function generateFilePath(session: PartialSession) {
+  const { campaign } = session;
+  const { outputDirectory } = campaign;
+  if (!outputDirectory || isEmpty(outputDirectory)) {
+    return undefined;
+  }
+  return outputDirectory
+    .replace("{campaignName}", campaign.name)
+    .replace("{sessionNumber}", session.number.toString())
+    .replace("{sessionName}", session.name ?? "")
+    .replace("{currentDate}", format(new Date(), "yyyy-MM-dd"))
+    .replace("{currentTime}", format(new Date(), "HH-mm"));
 }
 
 export function generateFileName(session: PartialSession) {
@@ -104,10 +118,16 @@ export function generateFileName(session: PartialSession) {
   if (!namingConvention || isEmpty(namingConvention)) {
     return `${format(new Date(), "yyyy-MM-dd")}-${format(new Date(), "HH-mm")}_notes.md`;
   }
-  return namingConvention
-    .replace("{campaignName}", campaign.name)
-    .replace("{sessionNumber}", session.number.toString())
-    .replace("{sessionName}", session.name ?? "")
-    .replace("{currentDate}", format(new Date(), "yyyy-MM-dd"))
-    .replace("{currentTime}", format(new Date(), "HH-mm"));
+
+  const fileExtensionExists = namingConvention.includes(".md");
+
+  return (
+    namingConvention
+      .replace("{campaignName}", campaign.name)
+      .replace("{sessionNumber}", session.number.toString())
+      .replace("{sessionName}", session.name ?? "")
+      .replace("{currentDate}", format(new Date(), "yyyy-MM-dd"))
+      .replace("{currentTime}", format(new Date(), "HH-mm")) +
+    (fileExtensionExists ? "" : ".md")
+  );
 }

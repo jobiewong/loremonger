@@ -1,7 +1,11 @@
 import { format } from "date-fns";
 import { useAtomValue } from "jotai";
 import { AnimatePresence, motion } from "motion/react";
-import { Progress, progressLogsAtom } from "~/components/audio-upload/atoms";
+import {
+  isLoadingAtom,
+  Progress,
+  progressLogsAtom,
+} from "~/components/audio-upload/atoms";
 import { Loader } from "~/components/loader";
 import {
   Table,
@@ -18,7 +22,8 @@ import {
 } from "~/components/ui/tooltip";
 import { cn } from "~/lib/utils";
 
-export function ProgressIndicator({ isLoading }: { isLoading: boolean }) {
+export function ProgressIndicator() {
+  const isLoading = useAtomValue(isLoadingAtom);
   const progressLogs = useAtomValue(progressLogsAtom);
 
   return (
@@ -40,7 +45,7 @@ export function ProgressIndicator({ isLoading }: { isLoading: boolean }) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {progressLogs.map((log, ci) => (
+              {progressLogs.map((log) => (
                 <LogRow
                   key={`${log.timestamp.toISOString()} ${log.message}`}
                   log={log}

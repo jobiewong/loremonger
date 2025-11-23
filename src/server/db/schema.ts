@@ -7,7 +7,9 @@ export const campaigns = sqliteTable("campaigns", {
   dmName: text("dm_name").notNull(),
   description: text("description"),
   outputDirectory: text("output_directory"),
-  namingConvention: text("naming_convention"),
+  namingConvention: text("naming_convention")
+    .notNull()
+    .default("{currentDate}-{currentTime}_notes.md"),
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
   updatedAt: text("updated_at").default(sql`CURRENT_TIMESTAMP`),
 });

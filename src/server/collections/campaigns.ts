@@ -1,4 +1,4 @@
-import { createCollection } from "@tanstack/db";
+import { createCollection, eq as eqDb } from "@tanstack/db";
 import { queryCollectionOptions } from "@tanstack/query-db-collection";
 import { useLiveQuery } from "@tanstack/react-db";
 import { desc, eq } from "drizzle-orm";
@@ -40,6 +40,15 @@ const campaignsCollection = createCollection(
 
 export const useCampaigns = () => {
   return useLiveQuery((q) => q.from({ campaigns: campaignsCollection }));
+};
+
+export const useCampaign = (id: string) => {
+  return useLiveQuery((q) =>
+    q
+      .from({ campaign: campaignsCollection })
+      .where(({ campaign }) => eqDb(campaign.id, id))
+      .findOne()
+  );
 };
 
 export default campaignsCollection;

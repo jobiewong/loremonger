@@ -11,10 +11,27 @@
     "fs:default",
     "fs:allow-create",
     {
+      "identifier": "fs:allow-mkdir",
+      "allow": [
+        {
+          "path": "$HOME/**"
+        },
+        {
+          "path": "$DOCUMENT/**"
+        }
+      ]
+    },
+    {
       "identifier": "fs:allow-write-file",
       "allow": [
         {
           "path": "$APPDATA/**"
+        },
+        {
+          "path": "$HOME/**"
+        },
+        {
+          "path": "$DOCUMENT/**"
         },
         {
           "path": "$TEMP/**"
