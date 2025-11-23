@@ -13,3 +13,5 @@ This template should help get you started developing with Tauri, React and Types
 - [ ] Refactor: audio-upload component
 - [ ] Delete associated files when deleting a session or campaign
 - [ ] Promopt when re-transcribing audio for a session that old data will be overwritten
+- [ ] Implement Obsidian-style markdown linking for notes to create a networked knowledge base
+- [ ] Add functionality to scan existing notes (locations, events, people) in a campaign's output directory and automatically update them based on new session transcripts
