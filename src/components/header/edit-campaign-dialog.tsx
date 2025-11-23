@@ -58,6 +58,8 @@ export function EditCampaignDialog({
         name: campaign.name,
         dmName: campaign.dmName,
         description: campaign.description ?? "",
+        outputDirectory: campaign.outputDirectory ?? "",
+        namingConvention: campaign.namingConvention ?? "",
       });
     }
   }, [campaign]);
@@ -202,6 +204,7 @@ export function EditCampaignDialog({
                           <ul className="list-disc list-inside marker:text-accent-500">
                             <li>{`{campaignName}`}</li>
                             <li>{`{sessionNumber}`}</li>
+                            <li>{`{sessionName}`}</li>
                             <li>{`{currentDate}`}</li>
                             <li>{`{currentTime}`}</li>
                           </ul>

@@ -1,5 +1,6 @@
 import { createFileRoute, useLoaderData } from "@tanstack/react-router";
-import { format } from "date-fns";
+import { differenceInDays, format } from "date-fns";
+import { TimeAgo } from "~/components/time-ago";
 import { Badge } from "~/components/ui/badge";
 import { Scroller } from "~/components/ui/scroller";
 import {
@@ -38,7 +39,6 @@ function RouteComponent() {
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className="space-y-2">
                   <div>
-                    {" "}
                     <p className="font-medium">Outputs to:</p>
                     <pre>
                       {isEmpty(campaign?.outputDirectory)
@@ -69,7 +69,25 @@ function RouteComponent() {
                     )}
                   </Badge>
                 </TooltipTrigger>
-                <TooltipContent side="bottom">Created At</TooltipContent>
+                <TooltipContent side="bottom" className="space-y-2">
+                  <div>
+                    {" "}
+                    Created{" "}
+                    <TimeAgo
+                      date={new Date(campaign?.createdAt ?? new Date())}
+                      className="text-inherit"
+                      timeStyle="long"
+                    />
+                  </div>
+                  <div>
+                    Updated{" "}
+                    <TimeAgo
+                      date={new Date(campaign?.updatedAt ?? new Date())}
+                      className="text-inherit"
+                      timeStyle="long"
+                    />
+                  </div>
+                </TooltipContent>
               </Tooltip>
             </div>
           </section>

@@ -3,10 +3,12 @@ import { save } from "@tauri-apps/plugin-dialog";
 import { create } from "@tauri-apps/plugin-fs";
 import { Store } from "@tauri-apps/plugin-stronghold";
 import { clsx, type ClassValue } from "clsx";
+import { format } from "date-fns";
 import { twMerge } from "tailwind-merge";
 import { encoding_for_model, type TiktokenModel } from "tiktoken";
 import { v7 as uuidv7 } from "uuid";
 import { initStronghold } from "~/lib/stronghold";
+import { Campaign, Session } from "~/types";
 
 let strongholdStorePromise: Promise<Store> | null = null;
 
@@ -85,4 +87,27 @@ export function generateId() {
 
 export function isEmpty(value: string | null | undefined) {
   return value === null || value === undefined || value.trim() === "";
+}
+
+interface PartialSession {
+  name: string | null;
+  number: number;
+  campaign: {
+    name: string;
+    namingConvention?: string;
+  };
+}
+
+export function generateFileName(session: PartialSession) {
+  const { campaign } = session;
+  const { namingConvention } = campaign;
+  if (!namingConvention || isEmpty(namingConvention)) {
+    return `${format(new Date(), "yyyy-MM-dd")}-${format(new Date(), "HH-mm")}_notes.md`;
+  }
+  return namingConvention
+    .replace("{campaignName}", campaign.name)
+    .replace("{sessionNumber}", session.number.toString())
+    .replace("{sessionName}", session.name ?? "")
+    .replace("{currentDate}", format(new Date(), "yyyy-MM-dd"))
+    .replace("{currentTime}", format(new Date(), "HH-mm"));
 }

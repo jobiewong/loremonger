@@ -1,136 +1,99 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { IconArrowOutOfBox, IconCrossSmall } from "central-icons";
-import { useMemo, useState } from "react";
+import { IconSquareInfo } from "central-icons";
+import { useState } from "react";
 import { Button } from "~/components/ui/button";
-import { ComboboxComponent } from "~/components/ui/combobox";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
 import {
-  FileUpload,
-  FileUploadDropzone,
-  FileUploadItem,
-  FileUploadItemDelete,
-  FileUploadItemPreview,
-  FileUploadList,
-  FileUploadTrigger,
-} from "~/components/ui/file-upload";
-import { useCampaigns } from "~/server/collections/campaigns";
-
-import { invoke } from "@tauri-apps/api/core";
-import { appDataDir, tempDir } from "@tauri-apps/api/path";
-import { writeFile } from "@tauri-apps/plugin-fs";
-import { toast } from "sonner";
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "~/components/ui/tooltip";
+import { generateFileName } from "~/lib/utils";
+import { Campaign, Session } from "~/types";
 
 export const Route = createFileRoute("/workbench")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const [files, setFiles] = useState<File[]>([]);
-  const [selectedSession, setSelectedSession] = useState<string | undefined>(
-    undefined
+  const [value, setValue] = useState<string>(
+    "{currentDate}-{currentTime}_notes.md"
   );
-  const { data: campaigns } = useCampaigns();
-
-  const campaignOptions = useMemo(
-    () =>
-      campaigns.map((campaign) => ({
-        groupLabel: campaign.name,
-        options: campaign.sessions.map((session) => ({
-          label: session.name ?? `Session ${session.number}`,
-          value: session.id,
-        })),
-      })),
-    [campaigns]
-  );
-  console.log("🚀 ~ RouteComponent ~ campaignOptions:", campaignOptions);
+  const [output, setOutput] = useState<string>("");
+  const session: Session & { campaign: Campaign } = {
+    id: "123",
+    name: "Example Session",
+    number: 1,
+    campaignId: "123",
+    date: new Date().toISOString(),
+    duration: 100,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    wordCount: 100,
+    noteWordCount: 100,
+    filePath: "Example File Path",
+    campaign: {
+      id: "123",
+      name: "Example Campaign",
+      dmName: "Example DM",
+      description: "Example Campaign Description",
+      outputDirectory: "/Users/jobiewong/Documents",
+      namingConvention: "{currentDate}-{currentTime}_notes.md",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+  };
 
   async function handleSubmit() {
-    const toastId = toast.loading("Processing files...");
-    if (!selectedSession) {
-      toast.error("Please select a session", { id: toastId });
-      return;
-    }
-
-    try {
-      const tempDirPath = await tempDir();
-      const filePaths: string[] = [];
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const tempPath = `${tempDirPath}/${selectedSession}_${i}_${file.name.slice(0, 10)}`;
-        const arrayBuffer = await file.arrayBuffer();
-        await writeFile(tempPath, new Uint8Array(arrayBuffer));
-        filePaths.push(tempPath);
-      }
-
-      console.log("🚀 ~ handleSubmit ~ filePaths:", filePaths);
-      const outputPath = await invoke<string>("process_audio_files", {
-        request: {
-          file_paths: filePaths,
-          output_filename: `/audio.mp3`,
-          session_id: selectedSession,
-        },
-      });
-
-      toast.success("Files processed", {
-        description: outputPath,
-        id: toastId,
-      });
-    } catch (error) {
-      toast.error("Failed to process files", { id: toastId });
-      console.error("🚀 ~ handleSubmit ~ error:", error);
-    }
+    const updatedSession = {
+      ...session,
+      campaign: {
+        ...session.campaign,
+        namingConvention: value,
+      },
+    };
+    const fileName = generateFileName(updatedSession);
+    setOutput(fileName);
   }
 
   return (
     <main className="page-wrapper flex flex-col items-center">
       <div className="content-wrapper w-full flex flex-col gap-4">
-        <ComboboxComponent
-          options={campaignOptions}
-          className="w-full"
-          onValueChange={(value) => {
-            setSelectedSession(value as string);
-          }}
-        />
-        <FileUpload
-          value={files}
-          onValueChange={setFiles}
-          className="gap-0 w-full"
-          accept="audio/*,video/*"
-          multiple
-        >
-          <FileUploadDropzone className="border border-border offset-border border-solid bg-background">
-            <div className="flex flex-col items-center gap-1 text-center">
-              <div className="flex items-center justify-center rounded-full border p-2.5">
-                <IconArrowOutOfBox className="text-accent-600" />
-              </div>
-              <p className="font-medium text-sm">
-                Drag & drop audio files here
-              </p>
-              <p className="text-muted-foreground text-xs">
-                Or click to browse (.mp3, .wav, .m4a)
-              </p>
-            </div>
-            <FileUploadTrigger className="border text-sm px-3 py-1 mt-3 font-semibold hover:bg-accent hover:text-accent-foreground">
-              Browse Files
-            </FileUploadTrigger>
-          </FileUploadDropzone>
-          <FileUploadList>
-            {files.map((file, index) => (
-              <FileUploadItem
-                key={index}
-                value={file}
-                className="offset-border"
+        <Label>
+          <div className="flex items-center gap-2">
+            Naming Convention{" "}
+            <Tooltip>
+              <TooltipTrigger>
+                <IconSquareInfo className="size-4 opacity-60 hover:opacity-100" />
+              </TooltipTrigger>
+              <TooltipContent
+                className="max-w-xs space-y-2"
+                classNames={{
+                  arrow: "translate-y-[calc(50%-2px)]",
+                }}
               >
-                <FileUploadItemPreview />
-                <FileUploadItemDelete asChild>
-                  <Button variant="ghost" size="icon" className="size-7">
-                    <IconCrossSmall />
-                  </Button>
-                </FileUploadItemDelete>
-              </FileUploadItem>
-            ))}
-          </FileUploadList>
-        </FileUpload>
+                <p>
+                  Determines the generated file name for each session note. The
+                  following variables are available:
+                </p>
+                <ul className="list-disc list-inside marker:text-accent-500">
+                  <li>{`{campaignName}`}</li>
+                  <li>{`{sessionNumber}`}</li>
+                  <li>{`{currentDate}`}</li>
+                  <li>{`{currentTime}`}</li>
+                </ul>
+                <p>
+                  If undefined, the default is{" "}
+                  <b>{`{currentDate}-{currentTime}_notes.md`}</b>.
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </Label>
+        <Input value={value} onChange={(e) => setValue(e.target.value)} />
         <Button onClick={handleSubmit}>Submit</Button>
+        <p>{output}</p>
       </div>
     </main>
   );

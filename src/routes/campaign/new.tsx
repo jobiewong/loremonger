@@ -67,16 +67,20 @@ function RouteComponent() {
     }
   }
 
-  function handleCreateCampaign(values: z.infer<typeof campaignDetailsSchema>) {
+  async function handleCreateCampaign(
+    values: z.infer<typeof campaignDetailsSchema>
+  ) {
     const id = generateId();
     const date = new Date().toISOString();
+    const documentsDir = await documentDir();
 
     campaignsCollection.insert({
       ...values,
       id,
       description: values.description ?? null,
-      outputDirectory: values.outputDirectory ?? null,
-      namingConvention: values.namingConvention ?? null,
+      outputDirectory: values.outputDirectory ?? documentsDir,
+      namingConvention:
+        values.namingConvention ?? "{currentDate}-{currentTime}_notes.md",
       createdAt: date,
       updatedAt: date,
       players: [],
