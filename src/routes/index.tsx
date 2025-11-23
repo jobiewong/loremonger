@@ -1,5 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Button } from "~/components/ui/button";
+import { createFileRoute } from "@tanstack/react-router";
+import { AsciiLogo } from "~/components/ascii-logo";
+import { CampaignListTable } from "~/routes/-components/session-list-table";
 import "~/styles/globals.css";
 
 export const Route = createFileRoute("/")({
@@ -10,10 +11,11 @@ function RouteComponent() {
   return (
     <main className="page-wrapper flex flex-col items-center">
       <div className="content-wrapper space-y-6">
-        <h1>Loremonger</h1>
-        <Link to="/workbench">
-          <Button>Workbench</Button>
-        </Link>
+        <div className="flex flex-col items-center">
+          <AsciiLogo className="text-[6px] md:text-[8px] leading-1.5 md:leading-2 text-accent-500" />
+          <p className="text-sm text-muted-foreground">By Jobie Wong</p>
+        </div>
+        <CampaignListTable />
       </div>
     </main>
   );
