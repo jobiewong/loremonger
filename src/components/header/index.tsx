@@ -3,7 +3,9 @@ import { useTheme } from "next-themes";
 import { useState } from "react";
 import packageJson from "~/../package.json";
 import { DeleteCampaign } from "~/components/header/delete-campaign";
+import { DeleteSession } from "~/components/header/delete-session";
 import { EditCampaignDialog } from "~/components/header/edit-campaign-dialog";
+import { EditSessionDialog } from "~/components/header/edit-session.dialog";
 import { TimeAgo } from "~/components/time-ago";
 import {
   DropdownMenu,
@@ -26,6 +28,7 @@ export function Header() {
   const { data: campaigns } = useCampaigns();
   const matches = useMatches();
   const [editCampaignDialogOpen, setEditCampaignDialogOpen] = useState(false);
+  const [editSessionDialogOpen, setEditSessionDialogOpen] = useState(false);
   const isOnCampaignPage = matches.some(
     (match) => match.routeId === "/campaign/$campaignId/"
   );
@@ -94,8 +97,12 @@ export function Header() {
                 {isOnSessionPage && (
                   <>
                     <DropdownMenuGroup>
-                      <DropdownMenuItem>Edit Session</DropdownMenuItem>
-                      <DropdownMenuItem>Delete Session</DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => setEditSessionDialogOpen(true)}
+                      >
+                        Edit Session
+                      </DropdownMenuItem>
+                      <DeleteSession />
                     </DropdownMenuGroup>
                     <DropdownMenuSeparator />
                   </>
@@ -156,6 +163,10 @@ export function Header() {
       <EditCampaignDialog
         open={editCampaignDialogOpen}
         onOpenChange={setEditCampaignDialogOpen}
+      />
+      <EditSessionDialog
+        open={editSessionDialogOpen}
+        onOpenChange={setEditSessionDialogOpen}
       />
     </header>
   );

@@ -4,29 +4,27 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { DropdownMenuItem } from "~/components/ui/dropdown-menu";
 import { cn } from "~/lib/utils";
-import campaignsCollection from "~/server/collections/campaigns";
+import sessionsCollection from "~/server/collections/sessions";
 
-export function DeleteCampaign() {
+export function DeleteSession() {
   const matches = useMatches();
-  const isOnCampaignPage = matches.find(
-    (match) => match.routeId === "/campaign/$campaignId/"
-  );
   const isOnSessionPage = matches.find(
     (match) => match.routeId === "/campaign/$campaignId/$sessionId/"
   );
-  const campaign = isOnCampaignPage?.loaderData?.campaign;
   const session = isOnSessionPage?.loaderData?.session;
-  const campaignId = session?.campaignId ?? campaign?.id;
   const navigate = useNavigate();
 
   const [isClicked, setIsClicked] = useState(false);
 
   function handleClick() {
-    if (isClicked && campaignId) {
+    if (isClicked && session) {
       setIsClicked(false);
-      campaignsCollection.delete(campaignId);
-      toast.success("Campaign deleted");
-      navigate({ to: "/" });
+      sessionsCollection.delete(session.id);
+      toast.success("Session deleted");
+      navigate({
+        to: "/campaign/$campaignId",
+        params: { campaignId: session.campaignId },
+      });
     } else {
       setIsClicked(true);
     }
@@ -71,7 +69,7 @@ export function DeleteCampaign() {
             exit={{ opacity: 0, y: 20 }}
             transition={{ bounce: 0, duration: 0.3, type: "spring" }}
           >
-            Delete Campaign
+            Delete Session
           </motion.div>
         )}
       </AnimatePresence>

@@ -39,7 +39,9 @@ export const playerRelations = relations(players, ({ one }) => ({
 
 export const sessions = sqliteTable("sessions", {
   id: text("id").primaryKey(),
-  campaignId: text("campaign_id").references(() => campaigns.id),
+  campaignId: text("campaign_id")
+    .references(() => campaigns.id)
+    .notNull(),
   number: integer("number").notNull(),
   name: text("name"),
   duration: real("duration").notNull().default(0),
