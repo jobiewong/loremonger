@@ -40,20 +40,19 @@ export function CreateSessionDialog() {
   const navigate = useNavigate();
 
   function handleCreateSession(values: z.infer<typeof formSchema>) {
-    console.log("fire");
     if (!campaign) {
       toast.error("Current campaign not found");
       return;
     }
     const id = generateId();
-    const session = sessionsCollection.insert({
+    sessionsCollection.insert({
       id,
       campaignId: campaign?.id,
       name: values.name,
       date: values.date,
       number: campaign.sessions.length + 1,
       duration: 0,
-      filePath: "", // TODO: Implement file path
+      filePath: null,
       wordCount: null,
       noteWordCount: null,
       createdAt: new Date().toISOString(),

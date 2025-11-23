@@ -49,7 +49,7 @@ export const sessions = sqliteTable("sessions", {
   duration: real("duration").notNull().default(0),
   wordCount: integer("word_count"),
   noteWordCount: integer("note_word_count"),
-  filePath: text("file_path").notNull().default(""),
+  filePath: text("file_path"),
   date: text("date").notNull(),
   createdAt: text("created_at")
     .default(sql`CURRENT_TIMESTAMP`)

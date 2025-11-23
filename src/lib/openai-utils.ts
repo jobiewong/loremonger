@@ -78,10 +78,6 @@ export async function generateNotes(
   ### Next Steps
   `;
 
-    const { tokens, cost } = calculateCost(transcript, "gpt-5-nano");
-    console.log("🚀 ~ generateNotes ~ tokens:", tokens, cost);
-
-    console.log("Generating notes...");
     const { text, usage } = await generateText({
       model: aiClient("gpt-5-nano"),
       system: debug ? debugPrompt : systemPrompt,
@@ -89,7 +85,6 @@ export async function generateNotes(
     ${transcript}`,
     });
 
-    console.log("Notes generated");
     console.log("Usage: ", JSON.stringify(usage, null, 2));
 
     return text;
