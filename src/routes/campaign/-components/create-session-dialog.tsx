@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { z } from "zod/v4";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import { DatePicker } from "~/components/ui/date-picker";
 import {
   Dialog,
   DialogClose,
@@ -111,7 +112,17 @@ export function CreateSessionDialog() {
                 render={({ field }) => (
                   <Field>
                     <FieldLabel>Session Date</FieldLabel>
-                    <Input {...field} type="date" />
+                    <DatePicker
+                      initialValue={
+                        field.value ? new Date(field.value) : new Date()
+                      }
+                      onChange={(date) => {
+                        const dateString = (
+                          date as unknown as Date | undefined
+                        )?.toISOString();
+                        field.onChange(dateString ?? undefined);
+                      }}
+                    />
                   </Field>
                 )}
               />
