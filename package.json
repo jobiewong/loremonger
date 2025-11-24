@@ -3,6 +3,8 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "repository": "https://github.com/jobiewong/loremonger",
+  "author": "Jobie Wong <jobietsy@gmail.com>",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -45,6 +47,7 @@
     "@tauri-apps/plugin-opener": "^2",
     "@tauri-apps/plugin-sql": "^2.3.1",
     "@tauri-apps/plugin-stronghold": "^2.3.1",
+    "@tauri-apps/plugin-updater": "^2.9.0",
     "ai": "^5.0.93",
     "buffer": "^6.0.3",
     "central-icons": "npm:@central-icons-react/square-outlined-radius-0-stroke-2@^1.0.1",
@@ -77,6 +80,7 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
+    "@commitlint/config-conventional": "^20.0.0",
     "@tanstack/router-plugin": "^1.136.0",
     "@tauri-apps/cli": "^2",
     "@types/node": "^24.10.1",

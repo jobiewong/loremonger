@@ -1,18 +1,19 @@
 use std::fs;
 use tauri::Manager;
-mod drizzle_proxy;
 mod audio_processor;
+mod drizzle_proxy;
 include!(concat!(env!("OUT_DIR"), "/generated_migrations.rs"));
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let migrations = load_migrations();
     tauri::Builder::default()
-    .plugin(
-        tauri_plugin_sql::Builder::default()
-            .add_migrations("sqlite:database.db", migrations)
-            .build(),
-    )
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(
+            tauri_plugin_sql::Builder::default()
+                .add_migrations("sqlite:database.db", migrations)
+                .build(),
+        )
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
@@ -32,7 +33,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             drizzle_proxy::run_sql,
             audio_processor::process_audio_files
-            ])
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

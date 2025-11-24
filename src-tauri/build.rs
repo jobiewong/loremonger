@@ -30,7 +30,7 @@ fn main() {
             .next()
             .and_then(|v| v.parse::<i64>().ok())
             .unwrap_or(0);
-        let description = "init"; 
+        let description = "init";
 
         // Copy the .sql file into OUT_DIR
         let dest_path = out_dir.join(&file_name);
