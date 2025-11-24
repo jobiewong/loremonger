@@ -8,7 +8,7 @@
     [
       "@semantic-release/npm",
       {
-        "npmPublish": true
+        "npmPublish": false
       }
     ],
     [
@@ -16,6 +16,12 @@
       {
         "assets": ["package.json", "package-lock.json", "CHANGELOG.md"],
         "message": "chore(release): bump version to ${nextRelease.version}"
+      }
+    ],
+    [
+      "@semantic-release/exec",
+      {
+        "postrelease": "echo '{\"version\":\"${nextRelease.version}\",\"notes\":\"${nextRelease.notes}\"}' > release-info.json"
       }
     ]
   ]
