@@ -1,1 +1,1 @@
-echo "npx --no -- commitlint --edit \$1" > .husky/commit-msg
+echo "npx commitlint --edit .git/COMMIT_EDITMSG" > .husky/commit-msg
