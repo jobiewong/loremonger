@@ -80,6 +80,7 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
+    "@commitlint/cli": "^20.1.0",
     "@commitlint/config-conventional": "^20.0.0",
     "@tanstack/router-plugin": "^1.136.0",
     "@tauri-apps/cli": "^2",
