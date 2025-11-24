@@ -92,7 +92,7 @@ jobs:
       - name: Build + upload via tauri-action
         uses: tauri-apps/tauri-action@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
           CENTRAL_LICENSE_KEY: ${{ secrets.CENTRAL_LICENSE_KEY }}
           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
