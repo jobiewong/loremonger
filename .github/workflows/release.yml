@@ -6,6 +6,8 @@ on:
 
 jobs:
   semantic_release:
+    env:
+      CENTRAL_LICENSE_KEY: ${{ secrets.CENTRAL_LICENSE_KEY }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
