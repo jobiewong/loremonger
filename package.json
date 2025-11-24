@@ -12,7 +12,8 @@
     "tauri": "tauri",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "prepare": "husky"
   },
   "dependencies": {
     "@ai-sdk/openai": "^2.0.65",
