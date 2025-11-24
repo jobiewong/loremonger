@@ -30,6 +30,7 @@ jobs:
         name: Run semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          CENTRAL_LICENSE_KEY: ${{ secrets.CENTRAL_LICENSE_KEY }}
         run: npx semantic-release
 
       # capture metadata for downstream jobs (uses @semantic-release/exec postrelease hook)
