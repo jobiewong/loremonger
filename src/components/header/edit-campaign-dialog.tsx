@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { eq, useLiveQuery } from "@tanstack/react-db";
 import { useMatches, useRouter } from "@tanstack/react-router";
 import { documentDir } from "@tauri-apps/api/path";
 import { IconSquareInfo } from "central-icons";

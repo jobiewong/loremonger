@@ -1,9 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  IconArrowLeft,
-  IconFloppyDisk1 as IconFloppyDisk,
-} from "central-icons";
+import { createFileRoute } from "@tanstack/react-router";
+import { IconFloppyDisk1 as IconFloppyDisk } from "central-icons";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod/v4";
@@ -19,7 +16,6 @@ import {
   FieldSet,
 } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
 import { useStronghold } from "~/hooks/use-stronghold";
 import { insertRecord } from "~/lib/stronghold";
 

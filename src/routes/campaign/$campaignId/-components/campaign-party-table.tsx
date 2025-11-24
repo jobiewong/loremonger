@@ -1,5 +1,3 @@
-import { Link } from "@tanstack/react-router";
-import { format } from "date-fns";
 import { Badge } from "~/components/ui/badge";
 import {
   Table,
@@ -9,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { Campaign, Player, Session } from "~/types";
+import { Campaign, Player } from "~/types";
 
 interface CampaignWithPlaters extends Campaign {
   players: Player[];

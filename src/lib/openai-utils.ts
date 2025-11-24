@@ -2,7 +2,7 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { generateText } from "ai";
 import { toast } from "sonner";
 import { getRecord } from "~/lib/stronghold";
-import { calculateCost, getStrongholdStore } from "~/lib/utils";
+import { getStrongholdStore } from "~/lib/utils";
 import { Player } from "~/types";
 
 let cachedApiKey: string | null = null;

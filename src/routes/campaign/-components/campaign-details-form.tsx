@@ -1,6 +1,5 @@
-import { zodResolver } from "@hookform/resolvers/zod";
 import { IconFolder2, IconSquareInfo } from "central-icons";
-import { Controller, useForm, UseFormReturn } from "react-hook-form";
+import { Controller, UseFormReturn } from "react-hook-form";
 import { z } from "zod/v4";
 import { Button } from "~/components/ui/button";
 import {

@@ -344,7 +344,11 @@ function ComboboxComponent({
   );
 
   return (
-    <Combobox value={value} onValueChange={setValue} {...props}>
+    <Combobox
+      value={value}
+      onValueChange={(value) => setValue(value as string)}
+      {...props}
+    >
       {label && <ComboboxLabel htmlFor={name}>{label}</ComboboxLabel>}
       <ComboboxAnchor>
         <ComboboxInput
