@@ -1,7 +1,5 @@
 import * as MentionPrimitive from "@diceui/mention";
-import { Proportions } from "lucide-react";
 import type * as React from "react";
-import { Textarea } from "~/components/ui/textarea";
 
 import { cn } from "~/lib/utils";
 

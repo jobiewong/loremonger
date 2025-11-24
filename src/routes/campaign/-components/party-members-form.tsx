@@ -3,7 +3,6 @@ import { IconCrossMedium, IconPeopleAdd } from "central-icons";
 import { useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod/v4";
-import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
   Field,

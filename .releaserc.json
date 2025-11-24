@@ -1,0 +1,22 @@
+{
+  "branches": ["master"],
+  "plugins": [
+    "@semantic-release/github",
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    ["@semantic-release/changelog", { "changelogFile": "CHANGELOG.md" }],
+    [
+      "@semantic-release/npm",
+      {
+        "npmPublish": true
+      }
+    ],
+    [
+      "@semantic-release/git",
+      {
+        "assets": ["package.json", "package-lock.json", "CHANGELOG.md"],
+        "message": "chore(release): bump version to ${nextRelease.version}"
+      }
+    ]
+  ]
+}
