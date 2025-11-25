@@ -199,7 +199,7 @@ export function AudioUpload() {
           transcription.text,
           campaign?.dmName ?? "Unknown DM",
           campaign?.players ?? [],
-          true // debug
+          false // debug
         );
 
         if (notes) {
