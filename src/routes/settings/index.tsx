@@ -39,7 +39,7 @@ function RouteComponent() {
   const { client, stronghold, isLoading, error } = useStronghold();
 
   async function handleSave(values: z.infer<typeof formSchema>) {
-    const toastId = toast.loading("Saving API key...");
+    const toastId = toast.loading("Saving API keys...");
     try {
       if (!client || !stronghold) {
         throw new Error("Client or stronghold not found");
@@ -48,10 +48,10 @@ function RouteComponent() {
       insertRecord(store, "openai-api-key", values.openaiApiKey);
       insertRecord(store, "elevenlabs-api-key", values.elevenLabsApiKey);
       await stronghold.save();
-      toast.success("API key saved", { id: toastId });
+      toast.success("API keys saved", { id: toastId });
     } catch (error) {
       console.error("🚀 ~ handleSave ~ error:", error);
-      toast.error("Failed to save API key", { id: toastId });
+      toast.error("Failed to save API keys", { id: toastId });
     }
   }
 

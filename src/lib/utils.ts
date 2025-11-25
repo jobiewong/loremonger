@@ -59,7 +59,11 @@ export async function getStrongholdStore() {
 
 export async function saveFileWithPrompt(file: File) {
   const documentsDir = await documentDir();
-  const defaultPath = `${documentsDir}/${file.name}`;
+  const defaultPath = [documentsDir, file.name].join(
+    typeof window !== "undefined" && window?.process?.platform === "win32"
+      ? "\\"
+      : "/"
+  );
 
   const path = await save({
     filters: [
