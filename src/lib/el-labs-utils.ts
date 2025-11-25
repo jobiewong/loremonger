@@ -16,7 +16,9 @@ async function getCachedElevenlabsApiKey() {
     const toastId = toast.loading("Loading Elevenlabs API key...");
     apiKeyPromise = (async () => {
       const store = await getStrongholdStore();
+      console.log("🚀 ~ getCachedElevenlabsApiKey ~ store:", store);
       const apiKey = await getRecord(store, "elevenlabs-api-key");
+      console.log("🚀 ~ getCachedElevenlabsApiKey ~ apiKey:", apiKey);
       cachedApiKey = apiKey;
       apiKeyPromise = null;
       toast.success("Elevenlabs API key loaded", { id: toastId });
