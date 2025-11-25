@@ -1,3 +1,11 @@
+## [1.0.2](https://github.com/jobiewong/loremonger/compare/v1.0.1...v1.0.2) (2025-11-25)
+
+
+### Bug Fixes
+
+* handle windows file paths and allow writing anywhere ([6779ab3](https://github.com/jobiewong/loremonger/commit/6779ab3c1fae156c1e8dff35ec86a0c79e5b179b))
+* update debug flag in audio upload component ([2dc24a2](https://github.com/jobiewong/loremonger/commit/2dc24a2fef35ab7e0d5056bc2d97abba11ef6327))
+
 ## [1.0.1](https://github.com/jobiewong/loremonger/compare/v1.0.0...v1.0.1) (2025-11-25)
 
 

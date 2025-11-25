@@ -1,7 +1,7 @@
 {
   "name": "loremonger-app",
   "private": true,
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "module",
   "repository": "https://github.com/jobiewong/loremonger",
   "author": "Jobie Wong <jobietsy@gmail.com>",
