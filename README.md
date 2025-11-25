@@ -24,14 +24,15 @@ In the future, I want to have the output be an more Obsidian-like format. i.e. l
 
 - An OpenAI API key
 - An ElevenLabs API key
-- Ffmpeg
+- ffmpeg
 
 ## Todo
 
 - [ ] Detect if ffmpeg is installed and give option to download it if not
 - [ ] Refactor: audio-upload component
 - [ ] Delete associated files when deleting a session or campaign
-- [ ] Prompt customziation in settings
+- [ ] Prompt customization in settings
 - [ ] Prompt when re-transcribing audio for a session that old data will be overwritten
 - [ ] Implement Obsidian-style markdown linking for notes to create a networked knowledge base
 - [ ] Add functionality to scan existing notes (locations, events, people) in a campaign's output directory and automatically update them based on new session transcripts
+- [ ] Fix deployment workflow
