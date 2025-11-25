@@ -26,7 +26,6 @@ In the future, I want to have the output be an more Obsidian-like format. i.e. l
 
 - An OpenAI API key
 - An ElevenLabs API key
-- ffmpeg
 
 ## Future Development
 
