@@ -38,11 +38,17 @@ jobs:
       # capture metadata for downstream jobs (uses @semantic-release/exec postrelease hook)
       - id: meta
         run: |
-          cat release-info.json
-          echo "version=$(jq -r .version release-info.json)" >> "$GITHUB_OUTPUT"
-          echo "notes<<'EOF'" >> "$GITHUB_OUTPUT"
-          jq -r .notes release-info.json >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
+          if [ -f release-info.json ]; then
+            cat release-info.json
+            echo "version=$(jq -r .version release-info.json)" >> "$GITHUB_OUTPUT"
+            echo "notes<<'EOF'" >> "$GITHUB_OUTPUT"
+            jq -r .notes release-info.json >> "$GITHUB_OUTPUT"
+            echo "EOF" >> "$GITHUB_OUTPUT"
+          else
+            echo "No release was created. Skipping metadata extraction."
+            echo "version=" >> "$GITHUB_OUTPUT"
+            echo "notes=" >> "$GITHUB_OUTPUT"
+          fi
         shell: bash
 
       - uses: actions/upload-artifact@v4
@@ -52,6 +58,7 @@ jobs:
 
   tauri_build:
     needs: semantic_release
+    if: needs.semantic_release.outputs.next_version != ''
     strategy:
       fail-fast: false
       matrix:
