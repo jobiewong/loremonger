@@ -1,5 +1,7 @@
 # Loremonger
 
+> Loremonger is under active development so will likely be slightly broken and change frequently. Use at your own risk.
+
 Loremonger is a small utility for automatically generating D&D session notes from an audio recording. The notes are generated in markdown format to be used in a program such as Obsidian. Recordings can be multiple audio or video files — uploads are automatically concatenated and converted to a single .mp3 file.
 
 It was created for DM's and players to easily generate summaries of past sessions, and free up energy to enjoy the sessions and not worry about getting all the details written down.
