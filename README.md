@@ -16,9 +16,9 @@ It was created for DM's and players to easily generate summaries of past session
 
 Tauri is used for its low overhead and compatibility with frontend javascript frameworks like React. Tanstack Start is used (Tanstack Router + TanstackDB) for ease-of-use and because I wanted to test out TanstackDB in a side-project. It allows for automatic optimistic updates which is great for a desktop app like this. Data is stored in a local sqlite database and queried using DrizzleORM and TanstackDB for type-safe query generation. As there are no complex SQL queries needed in this app this was sufficient. API keys are provided by the user and configured in the in-app settings. These are then encrypted and stored using Tauri Stronghold. They are fetched on-demand by the client-side of the app in order for the AI SDK and JavaScript ElevenLabs SDK to be used (I am bad at Rust). While this isn't technically the safest thing to do (secrets on the client-side), as this is a desktop app I figured it was probably fine.
 
-Audio uploads are processed completely locally. Rust + ffmpeg is used for converting and videos to audio and concatenating multiple files. The outputted audio file is saved to the user's disk then sent to ElevenLabs for transcription. The transcript is saved to disk, then sent to OpenAI for note generation.
+Audio uploads are processed locally. Rust + ffmpeg are used for converting videos to audio and concatenation if multiple files are uploaded. The outputted audio file is saved to the user's disk then sent to ElevenLabs for transcription. The transcript is saved to disk, then sent to OpenAI for note generation.
 
-In the future, I want to have the ouput be an more Obsidian-like format. i.e. linked network of notes and sub-notes with characters/locations/events updated using a read + edit agentic workflow.
+In the future, I want to have the output be an more Obsidian-like format. i.e. linked network of notes and sub-notes with characters/locations/events updated using a read + edit agentic workflow.
 
 ## Requirements
 
