@@ -156,15 +156,19 @@ export function AudioUpload() {
         tag: "transcribe",
       });
 
-      const transcription = await transcribeAudio(file, (error) => {
-        updateLogs({
-          timestamp: new Date(),
-          message: `Error transcribing ${file.name}`,
-          tag: "transcribe",
-          status: "error",
-        });
-        throw error;
-      });
+      const transcription = await transcribeAudio(
+        file,
+        campaign.players.length + 1,
+        (error) => {
+          updateLogs({
+            timestamp: new Date(),
+            message: `Error transcribing ${file.name}`,
+            tag: "transcribe",
+            status: "error",
+          });
+          throw error;
+        }
+      );
       updateLogs({
         timestamp: new Date(),
         message: `Transcribed finished: ${transcription?.text.length} characters`,

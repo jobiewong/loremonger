@@ -1,6 +1,6 @@
 import { createCollection } from "@tanstack/db";
 import { queryCollectionOptions } from "@tanstack/query-db-collection";
-import { useLiveQuery } from "@tanstack/react-db";
+import { eq as dbEq, useLiveQuery } from "@tanstack/react-db";
 import { eq } from "drizzle-orm";
 import { queryClient } from "~/server/collections";
 import db from "~/server/db";
@@ -29,8 +29,12 @@ const playersCollection = createCollection(
   })
 );
 
-export const usePlayers = () => {
-  return useLiveQuery((q) => q.from({ players: playersCollection }));
+export const usePlayers = (campaignId?: string) => {
+  return useLiveQuery((q) =>
+    q
+      .from({ players: playersCollection })
+      .where(({ players }) => dbEq(players.campaignId, campaignId))
+  );
 };
 
 export default playersCollection;
