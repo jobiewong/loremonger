@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/jobiewong/loremonger/compare/v1.0.0...v1.0.1) (2025-11-25)
+
+
+### Bug Fixes
+
+* add exception catch to workflow ([c439515](https://github.com/jobiewong/loremonger/commit/c439515af8b19b4f08acf7fab606fe1adaeb70c8))
+
 # 1.0.0 (2025-11-24)
 
 
