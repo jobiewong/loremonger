@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/jobiewong/loremonger/compare/v1.0.2...v1.1.0) (2025-11-25)
+
+
+### Features
+
+* enhance audio transcription and add party member creation dialog ([de2fc1c](https://github.com/jobiewong/loremonger/commit/de2fc1cc429e07a61ecaf6ed008fe42336ac79b7))
+
 ## [1.0.2](https://github.com/jobiewong/loremonger/compare/v1.0.1...v1.0.2) (2025-11-25)
 
 
