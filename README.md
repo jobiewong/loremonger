@@ -26,15 +26,20 @@ In the future, I want to have the output be an more Obsidian-like format. i.e. l
 
 - An OpenAI API key
 - An ElevenLabs API key
-- ffmpeg
 
-## Todo
+## Future Development
 
-- [ ] Detect if ffmpeg is installed and give option to download it if not
-- [ ] Refactor: audio-upload component
+### Priority 1
 - [ ] Delete associated files when deleting a session or campaign
-- [ ] Prompt customization in settings
-- [ ] Prompt when re-transcribing audio for a session that old data will be overwritten
+- [ ] Update UI when a session already has a transcription/notes
+
+### Priority 2
+- [ ] Refactor audio-upload component
 - [ ] Implement Obsidian-style markdown linking for notes to create a networked knowledge base
-- [ ] Add functionality to scan existing notes (locations, events, people) in a campaign's output directory and automatically update them based on new session transcripts
-- [ ] Fix deployment workflow
+- [ ] Prompt customization in settings
+- [ ] Automatic updates
+
+### Priority 3
+- [ ] Download on demand from within the app, instead of packaging binaries with installer
+- [ ] MCP tooling for grepping note database, and selectively adding/editing/deleting notes based on the campaign notes contents
+- [ ] Fix auto-publishing GitHub workflow
