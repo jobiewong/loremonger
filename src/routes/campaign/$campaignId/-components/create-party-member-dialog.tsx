@@ -1,8 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMatches, useRouter } from "@tanstack/react-router";
-import { documentDir } from "@tauri-apps/api/path";
-import { IconPlusSmall, IconSquareInfo } from "central-icons";
-import { useEffect, useState } from "react";
+import { useRouter } from "@tanstack/react-router";
+import { IconPlusSmall } from "central-icons";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod/v4";
