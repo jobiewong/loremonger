@@ -1,4 +1,7 @@
+import { IconCrossMedium } from "central-icons";
+import { toast } from "sonner";
 import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
 import {
   Table,
   TableBody,
@@ -7,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
+import playersCollection, { usePlayers } from "~/server/collections/players";
 import { Campaign, Player } from "~/types";
 
 interface CampaignWithPlaters extends Campaign {
@@ -18,12 +22,14 @@ export function CampaignPartyTable({
 }: {
   campaign: CampaignWithPlaters;
 }) {
+  const { data: players } = usePlayers(campaign?.id);
   return (
     <Table>
       <TableHeader>
         <TableRow>
           <TableHead>Player</TableHead>
           <TableHead>Character</TableHead>
+          <TableHead className="w-6 px-0 text-right" />
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -38,10 +44,24 @@ export function CampaignPartyTable({
             </Badge>
           </TableCell>
         </TableRow>
-        {campaign?.players.map((player) => (
-          <TableRow key={player.id}>
+        {players.map((player) => (
+          <TableRow key={player.id} className="group">
             <TableCell>{player.playerName}</TableCell>
             <TableCell>{player.characterName}</TableCell>
+            <TableCell className="w-6 px-0 text-right">
+              <Button
+                variant="ghost"
+                size="icon"
+                type="button"
+                className="size-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={() => {
+                  playersCollection.delete(player.id);
+                  toast.success(`${player.playerName} removed from campaign`);
+                }}
+              >
+                <IconCrossMedium />
+              </Button>
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>

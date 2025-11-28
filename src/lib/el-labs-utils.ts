@@ -16,9 +16,7 @@ async function getCachedElevenlabsApiKey() {
     const toastId = toast.loading("Loading Elevenlabs API key...");
     apiKeyPromise = (async () => {
       const store = await getStrongholdStore();
-      console.log("🚀 ~ getCachedElevenlabsApiKey ~ store:", store);
       const apiKey = await getRecord(store, "elevenlabs-api-key");
-      console.log("🚀 ~ getCachedElevenlabsApiKey ~ apiKey:", apiKey);
       cachedApiKey = apiKey;
       apiKeyPromise = null;
       toast.success("Elevenlabs API key loaded", { id: toastId });
@@ -49,6 +47,7 @@ export function resetOpenAICache() {
 
 export async function transcribeAudio(
   file: File,
+  numSpeakers: number | undefined,
   onError: (error: Error) => void
 ) {
   try {
@@ -59,6 +58,7 @@ export async function transcribeAudio(
       tagAudioEvents: true,
       languageCode: "eng",
       diarize: true,
+      numSpeakers,
     });
 
     return transcription as SpeechToTextChunkResponseModel;

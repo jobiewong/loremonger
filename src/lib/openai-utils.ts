@@ -1,5 +1,6 @@
 import { createOpenAI } from "@ai-sdk/openai";
 import { generateText } from "ai";
+import { format } from "date-fns";
 import { toast } from "sonner";
 import { getRecord } from "~/lib/stronghold";
 import { getStrongholdStore } from "~/lib/utils";
@@ -53,9 +54,12 @@ export async function generateNotes(
     ## Session Summary
     ${transcript}
     `;
+
     const systemPrompt = `
-  You are a helpful assistant that generates session notes for a Dungeons and Dragons game. Your goal is to capture the important details of the session. Write summary descriptions of characters and places in the session, as well as a timeline of events. Bear in mind that the transcript is a real-time transcription of the session, so it may contain some errors and typos on names. Try to correct the transcription where possible without making assumptions.
-  The players consist of the following characters: 
+  You are a helpful assistant that generates session notes for a Dungeons and Dragons game. Your goal is to capture the important details of the session. Write summary descriptions of characters and places in the session, as well as a timeline of events. Ignore any information or dialog that is not related to in-world events (e.g. discussions about the recording equipment, campaign platform, etc.).
+
+  ## Players
+  The campaign players consist of the following characters: 
   ${players
     .map(
       (player) => `${player.characterName} (played by: ${player.playerName})`
@@ -63,9 +67,19 @@ export async function generateNotes(
     .join("\n")}
   The Dungeon Master name is ${dmName}.
 
-  The notes should be in markdown format with bold/italic/table/list/quote formatting where appropriate. Do not include any other text than the notes. Use a neutral tone and keep it concise while retaining important details.
-  The notes should include the following sections:
-  # Session Notes: (date)
+  If the transcript is clearly referring to the same character or player but with slightly different spelling, use the character name from the list of players. Bear in mind that the transcript is a real-time transcription of the session, so it may contain some errors and typos on names. 
+
+  ## Note Style
+  - The notes should be in markdown format with bold/italic/table/list/quote formatting where appropriate. 
+  - Do not include any other text than the notes.
+  - Use a neutral tone and keep it concise while retaining important details.
+
+  The notes should include the following structure:
+  \`\`\`markdown
+  ---
+  type: session
+  date: ${format(new Date(), "yyyy-MM-dd")}
+  ---
   ## Session Summary
   ## Characters
   ### Players
@@ -76,6 +90,7 @@ export async function generateNotes(
   ### Story Hooks
   ### Key Clues, Lore, & Items of Interest
   ### Next Steps
+  \`\`\`
   `;
 
     const { text, usage } = await generateText({

@@ -11,8 +11,10 @@ import {
 import { isEmpty } from "~/lib/utils";
 import { CampaignPartyTable } from "~/routes/campaign/$campaignId/-components/campaign-party-table";
 import { CampaignSessionTable } from "~/routes/campaign/$campaignId/-components/campaign-session-table";
+import { CreatePartyMemberDialog } from "~/routes/campaign/$campaignId/-components/create-party-member-dialog";
 import { CreateSessionDialog } from "~/routes/campaign/-components/create-session-dialog";
 import campaignsCollection from "~/server/collections/campaigns";
+import { usePlayers } from "~/server/collections/players";
 import { useSessions } from "~/server/collections/sessions";
 
 export const Route = createFileRoute("/campaign/$campaignId/")({
@@ -25,6 +27,7 @@ export const Route = createFileRoute("/campaign/$campaignId/")({
 
 function RouteComponent() {
   const { campaign } = useLoaderData({ from: Route.id });
+  const { data: players } = usePlayers(campaign?.id);
   const { data: sessions } = useSessions(campaign?.id);
 
   return (
@@ -97,15 +100,16 @@ function RouteComponent() {
             </section>
           )}
           <section>
-            {campaign && campaign.players.length > 0 && (
+            {players && campaign && (
               <div>
                 <h2 className="px-4 mb-2 font-medium">
                   Players{" "}
                   <span className="text-muted-foreground">
-                    ({campaign.players.length})
+                    ({players.length})
                   </span>
                 </h2>
                 <CampaignPartyTable campaign={campaign} />
+                <CreatePartyMemberDialog campaign={campaign} />
               </div>
             )}
           </section>
