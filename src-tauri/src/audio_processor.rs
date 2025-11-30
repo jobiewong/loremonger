@@ -3,55 +3,13 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use tauri::{command, AppHandle, Manager};
 
+use crate::audio_utils;
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ProcessAudioRequest {
     pub file_paths: Vec<String>,
     pub output_filename: String,
     pub session_id: String,
-}
-
-fn get_ffmpeg_path(app: &AppHandle) -> Result<PathBuf, String> {
-    let resource_dir = app
-        .path()
-        .resource_dir()
-        .map_err(|_| "Could not resolve resource directory")?;
-
-    #[cfg(target_os = "macos")]
-    let ffmpeg_path = resource_dir.join("binaries").join("macos").join("ffmpeg");
-
-    #[cfg(target_os = "windows")]
-    let ffmpeg_path = resource_dir
-        .join("binaries")
-        .join("windows")
-        .join("ffmpeg.exe");
-
-    // TODO: Add Linux binariess
-    // #[cfg(target_os = "linux")]
-    // let ffmpeg_path = resource_dir.join("binaries").join("linux").join("ffmpeg");
-
-    // If bundled FFmpeg doesn't exist, try system FFmpeg as fallback
-    if !ffmpeg_path.exists() {
-        // Try system FFmpeg
-        #[cfg(target_os = "windows")]
-        return Ok(PathBuf::from("ffmpeg.exe"));
-
-        #[cfg(not(target_os = "windows"))]
-        return Ok(PathBuf::from("ffmpeg"));
-    }
-
-    // Make FFmpeg executable on Unix systems
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::PermissionsExt;
-        let mut perms = std::fs::metadata(&ffmpeg_path)
-            .map_err(|e| format!("Failed to get FFmpeg metadata: {}", e))?
-            .permissions();
-        perms.set_mode(0o755);
-        std::fs::set_permissions(&ffmpeg_path, perms)
-            .map_err(|e| format!("Failed to set FFmpeg permissions: {}", e))?;
-    }
-
-    Ok(ffmpeg_path)
 }
 
 #[command]
@@ -71,7 +29,7 @@ pub async fn process_audio_files(
     // Output path: app_data_dir/sessions/{session_id}/audio.mp3
     let output_path = session_dir.join("audio.mp3");
 
-    let ffmpeg_path = get_ffmpeg_path(&app)?;
+    let ffmpeg_path = audio_utils::get_ffmpeg_path(&app)?;
 
     let temp_dir = app_data_dir.join("temp_audio");
     std::fs::create_dir_all(&temp_dir)

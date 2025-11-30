@@ -1,6 +1,8 @@
 use std::fs;
 use tauri::Manager;
 mod audio_processor;
+mod audio_transcription;
+mod audio_utils;
 mod drizzle_proxy;
 include!(concat!(env!("OUT_DIR"), "/generated_migrations.rs"));
 
@@ -32,7 +34,8 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
             drizzle_proxy::run_sql,
-            audio_processor::process_audio_files
+            audio_processor::process_audio_files,
+            audio_transcription::transcribe_audio
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

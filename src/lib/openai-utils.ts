@@ -10,7 +10,7 @@ let cachedApiKey: string | null = null;
 let apiKeyPromise: Promise<string> | null = null;
 let cachedAIProvider: ReturnType<typeof createOpenAI> | null = null;
 
-async function getCachedOpenaiApiKey() {
+export async function getCachedOpenaiApiKey() {
   if (cachedApiKey) {
     return cachedApiKey;
   }

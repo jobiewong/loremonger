@@ -160,9 +160,11 @@ export function AudioUpload() {
         file,
         campaign.players.length + 1,
         (error) => {
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
           updateLogs({
             timestamp: new Date(),
-            message: `Error transcribing ${file.name}`,
+            message: `Error transcribing ${file.name}: ${errorMessage}`,
             tag: "transcribe",
             status: "error",
           });
