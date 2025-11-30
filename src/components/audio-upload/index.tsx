@@ -14,9 +14,8 @@ import {
   progressLogsAtom,
 } from "~/components/audio-upload/atoms";
 import { ProgressIndicator } from "~/components/audio-upload/progress-indicator";
-import { DotsPattern } from "~/components/patterns/dots";
+import { StatusCard } from "~/components/status-card";
 import { Stopwatch } from "~/components/stopwatch";
-import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
   FileUpload,
@@ -31,11 +30,14 @@ import {
 import { transcribeAudio } from "~/lib/el-labs-utils";
 import { generateNotes } from "~/lib/openai-utils";
 import {
+  formatDuration,
+  formatFilePath,
   generateFileName,
   generateFilePath,
   getGpt5NanoCost,
   getTokenCount,
   saveFileWithPrompt,
+  saveLogs,
 } from "~/lib/utils";
 import { Route } from "~/routes/campaign/$campaignId/$sessionId";
 import sessionsCollection from "~/server/collections/sessions";
@@ -119,14 +121,11 @@ export function AudioUpload() {
         filePaths.push(tempPath);
       }
 
-      setProgressLogs((prev) => [
-        ...prev,
-        {
-          timestamp: new Date(),
-          message: `Pre-processing uploaded files: ${files.length} files`,
-          tag: "pre-process",
-        },
-      ]);
+      updateLogs({
+        timestamp: new Date(),
+        message: `Pre-processing uploaded files: ${files.length} files`,
+        tag: "pre-process",
+      });
 
       const outputPath = await invoke<string>("process_audio_files", {
         request: {
@@ -136,14 +135,11 @@ export function AudioUpload() {
         },
       });
 
-      setProgressLogs((prev) => [
-        ...prev,
-        {
-          timestamp: new Date(),
-          message: `Processed files saved to ${outputPath}`,
-          tag: "pre-process",
-        },
-      ]);
+      updateLogs({
+        timestamp: new Date(),
+        message: `Processed files saved to ${formatFilePath(outputPath)}`,
+        tag: "pre-process",
+      });
 
       const fileData = await readFile(outputPath);
       const file = new File([fileData], "audio.mp3", { type: "audio/mpeg" });
@@ -152,7 +148,7 @@ export function AudioUpload() {
 
       updateLogs({
         timestamp: new Date(),
-        message: `Transcribing audio: ${file.name}: ${duration.toFixed(2)}s`,
+        message: `Transcribing audio: ${file.name}: ${formatDuration(duration)}`,
         tag: "transcribe",
       });
 
@@ -173,7 +169,7 @@ export function AudioUpload() {
       );
       updateLogs({
         timestamp: new Date(),
-        message: `Transcribed finished: ${transcription?.text.length} characters`,
+        message: `Transcribed finished: ${transcription?.text.length.toLocaleString()} characters`,
         tag: "transcribe",
       });
       if (transcription) {
@@ -198,7 +194,7 @@ export function AudioUpload() {
         const cost = getGpt5NanoCost(tokens);
         updateLogs({
           timestamp: new Date(),
-          message: `Generating notes: ${tokens} tokens: ${wordCount} words: ~${cost.toFixed(6)} USD`,
+          message: `Generating notes: ${tokens.toLocaleString()} tokens: ${wordCount.toLocaleString()} words: ~${cost.toFixed(6)} USD`,
           tag: "generate",
         });
         const notes = await generateNotes(
@@ -211,7 +207,7 @@ export function AudioUpload() {
         if (notes) {
           updateLogs({
             timestamp: new Date(),
-            message: `Notes generated: ${notes.length} characters`,
+            message: `Notes generated: ${notes.length.toLocaleString()} characters`,
             tag: "generate",
           });
 
@@ -243,7 +239,7 @@ export function AudioUpload() {
 
           updateLogs({
             timestamp: new Date(),
-            message: `Notes saved to disk: ${notesPath}`,
+            message: `Notes saved to disk: ${formatFilePath(notesPath)}`,
             tag: "clean-up",
           });
           updateLogs({
@@ -265,6 +261,7 @@ export function AudioUpload() {
             message: `Session updated in database`,
             tag: "done",
           });
+          await saveLogs(progressLogs, session.id);
           setIsLoading(false);
           setIsSuccess(true);
         } else {
@@ -297,7 +294,7 @@ export function AudioUpload() {
   }
 
   return (
-    <div className="flex flex-col w-full gap-4">
+    <div className="flex flex-col w-full gap-4 pb-8">
       <motion.div layout="position">
         <FileUpload
           value={files}
@@ -366,12 +363,9 @@ export function AudioUpload() {
             initial={{ y: -30 }}
             animate={{ y: 0 }}
             exit={{ y: -30 }}
-            className="offset-border relative flex items-center gap-2 justify-center border text-center text-sm p-2 border-border h-30"
+            className="offset-border border w-full p-2 border-border h-30"
           >
-            <div className=" absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-              <Badge className="bg-green-700 text-white">Success</Badge>
-            </div>
-            <DotsPattern />
+            <StatusCard status="success" />
           </motion.div>
         ) : null}
       </AnimatePresence>

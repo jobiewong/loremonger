@@ -22,7 +22,6 @@ function RouteComponent() {
             Create Campaign
           </Button>
         </Link>
-        <Link to="/workbench">Workbench</Link>
       </div>
     </main>
   );

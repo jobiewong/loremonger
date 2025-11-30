@@ -107,7 +107,10 @@ function LogRow({
             </div>
           </TableCell>
         </TooltipTrigger>
-        <TooltipContent className="max-w-sm" disabled={log.message.length < 40}>
+        <TooltipContent
+          className="max-w-sm break-all"
+          disabled={log.message.length < 40}
+        >
           {log.message}
         </TooltipContent>
       </Tooltip>
