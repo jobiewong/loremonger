@@ -1,6 +1,5 @@
 import { useLoaderData } from "@tanstack/react-router";
 import { appDataDir } from "@tauri-apps/api/path";
-import { openPath } from "@tauri-apps/plugin-opener";
 import {
   IconSquareBehindSquare4 as IconCopy,
   IconFolder1 as IconFolder,

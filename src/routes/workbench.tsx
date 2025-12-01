@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { invoke } from "@tauri-apps/api/core";
-import { IconAudio, IconSquareInfo } from "central-icons";
+import { IconAudio } from "central-icons";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import {
@@ -11,16 +11,7 @@ import {
   FileUploadItemPreview,
   FileUploadList,
 } from "~/components/ui/file-upload";
-import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "~/components/ui/tooltip";
 import { getCachedOpenaiApiKey } from "~/lib/openai-utils";
-import { generateFileName } from "~/lib/utils";
-import { Campaign, Session } from "~/types";
 
 export const Route = createFileRoute("/workbench")({
   component: RouteComponent,
