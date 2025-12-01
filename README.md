@@ -34,7 +34,7 @@ In the future, I want to have the output be an more Obsidian-like format. i.e. l
 ### Priority 1
 
 - [ ] Delete associated files when deleting a session or campaign
-- [ ] Update UI when a session already has a transcription/notes
+- [x] Update UI when a session already has a transcription/notes
 
 ### Priority 2
 
