@@ -1,7 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { IconSquareInfo } from "central-icons";
+import { invoke } from "@tauri-apps/api/core";
+import { IconAudio, IconSquareInfo } from "central-icons";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
+import {
+  FileUpload,
+  FileUploadDropzone,
+  FileUploadItem,
+  FileUploadItemMetadata,
+  FileUploadItemPreview,
+  FileUploadList,
+} from "~/components/ui/file-upload";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import {
@@ -9,6 +18,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
+import { getCachedOpenaiApiKey } from "~/lib/openai-utils";
 import { generateFileName } from "~/lib/utils";
 import { Campaign, Session } from "~/types";
 
@@ -17,83 +27,51 @@ export const Route = createFileRoute("/workbench")({
 });
 
 function RouteComponent() {
-  const [value, setValue] = useState<string>(
-    "{currentDate}-{currentTime}_notes.md"
-  );
-  const [output, setOutput] = useState<string>("");
-  const session: Session & { campaign: Campaign } = {
-    id: "123",
-    name: "Example Session",
-    number: 1,
-    campaignId: "123",
-    date: new Date().toISOString(),
-    duration: 100,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    wordCount: 100,
-    noteWordCount: 100,
-    filePath: "Example File Path",
-    campaign: {
-      id: "123",
-      name: "Example Campaign",
-      dmName: "Example DM",
-      description: "Example Campaign Description",
-      outputDirectory: "/Users/jobiewong/Documents",
-      namingConvention: "{currentDate}-{currentTime}_notes.md",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-  };
+  const [files, setFiles] = useState<File[]>([]);
 
   async function handleSubmit() {
-    const updatedSession = {
-      ...session,
-      campaign: {
-        ...session.campaign,
-        namingConvention: value,
-      },
-    };
-    const fileName = generateFileName(updatedSession);
-    setOutput(fileName);
+    try {
+      if (files.length === 0) {
+        console.error("No file selected");
+        return;
+      }
+      const apiKey = await getCachedOpenaiApiKey();
+      // Convert File to ArrayBuffer, then to Uint8Array for Tauri
+      const arrayBuffer = await files[0].arrayBuffer();
+      const audioData = Array.from(new Uint8Array(arrayBuffer));
+      const transcription = await invoke<{ text: string }>("transcribe_audio", {
+        request: {
+          audio_data: audioData,
+          api_key: apiKey,
+        },
+      });
+      console.log("🚀 ~ handleSubmit ~ transcription:", transcription);
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   return (
     <main className="page-wrapper flex flex-col items-center">
       <div className="content-wrapper w-full flex flex-col gap-4">
-        <Label>
-          <div className="flex items-center gap-2">
-            Naming Convention{" "}
-            <Tooltip>
-              <TooltipTrigger>
-                <IconSquareInfo className="size-4 opacity-60 hover:opacity-100" />
-              </TooltipTrigger>
-              <TooltipContent
-                className="max-w-xs space-y-2"
-                classNames={{
-                  arrow: "translate-y-[calc(50%-2px)]",
-                }}
-              >
-                <p>
-                  Determines the generated file name for each session note. The
-                  following variables are available:
-                </p>
-                <ul className="list-disc list-inside marker:text-accent-500">
-                  <li>{`{campaignName}`}</li>
-                  <li>{`{sessionNumber}`}</li>
-                  <li>{`{currentDate}`}</li>
-                  <li>{`{currentTime}`}</li>
-                </ul>
-                <p>
-                  If undefined, the default is{" "}
-                  <b>{`{currentDate}-{currentTime}_notes.md`}</b>.
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </div>
-        </Label>
-        <Input value={value} onChange={(e) => setValue(e.target.value)} />
+        <FileUpload value={files} onValueChange={setFiles}>
+          <FileUploadDropzone>
+            <div className="flex flex-col items-center gap-1 text-center">
+              <div className="flex items-center justify-center rounded-full border p-2.5">
+                <IconAudio className="text-accent-600" />
+              </div>
+            </div>
+          </FileUploadDropzone>
+          <FileUploadList>
+            {files.map((file) => (
+              <FileUploadItem key={file.name} value={file}>
+                <FileUploadItemPreview />
+                <FileUploadItemMetadata />
+              </FileUploadItem>
+            ))}
+          </FileUploadList>
+        </FileUpload>
         <Button onClick={handleSubmit}>Submit</Button>
-        <p>{output}</p>
       </div>
     </main>
   );

@@ -13,9 +13,11 @@ import {
   FieldGroup,
   FieldLabel,
   FieldLegend,
+  FieldSeparator,
   FieldSet,
 } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
+import { Switch } from "~/components/ui/switch";
 import { useStronghold } from "~/hooks/use-stronghold";
 import { insertRecord } from "~/lib/stronghold";
 
@@ -24,8 +26,9 @@ export const Route = createFileRoute("/settings/")({
 });
 
 const formSchema = z.object({
-  openaiApiKey: z.string().min(1),
-  elevenLabsApiKey: z.string().min(1),
+  transcriptionService: z.enum(["elevenlabs", "openai"]),
+  elevenLabsApiKey: z.string().optional(),
+  openaiApiKey: z.string(),
 });
 
 function RouteComponent() {
@@ -39,19 +42,28 @@ function RouteComponent() {
   const { client, stronghold, isLoading, error } = useStronghold();
 
   async function handleSave(values: z.infer<typeof formSchema>) {
-    const toastId = toast.loading("Saving API keys...");
+    const toastId = toast.loading("Saving settings...");
     try {
       if (!client || !stronghold) {
         throw new Error("Client or stronghold not found");
       }
       const store = client.getStore();
-      insertRecord(store, "openai-api-key", values.openaiApiKey);
-      insertRecord(store, "elevenlabs-api-key", values.elevenLabsApiKey);
+      if (values.openaiApiKey !== "") {
+        insertRecord(store, "openai-api-key", values.openaiApiKey);
+      }
+      if (values.elevenLabsApiKey !== "") {
+        insertRecord(
+          store,
+          "elevenlabs-api-key",
+          values.elevenLabsApiKey ?? ""
+        );
+      }
+      insertRecord(store, "transcription-service", values.transcriptionService);
       await stronghold.save();
-      toast.success("API keys saved", { id: toastId });
+      toast.success("Settings saved", { id: toastId });
     } catch (error) {
       console.error("🚀 ~ handleSave ~ error:", error);
-      toast.error("Failed to save API keys", { id: toastId });
+      toast.error("Failed to save settings", { id: toastId });
     }
   }
 
@@ -80,7 +92,43 @@ function RouteComponent() {
             onSubmit={form.handleSubmit(handleSave)}
             className="px-4 w-full"
           >
-            <FieldGroup>
+            <FieldGroup className="gap-8">
+              <FieldSet>
+                <FieldLegend>General</FieldLegend>
+                <FieldGroup className="gap-4">
+                  <Controller
+                    name="transcriptionService"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field data-invalid={fieldState.invalid}>
+                        <div className="items-center flex gap-2 flex-row">
+                          <Switch
+                            {...field}
+                            onCheckedChange={(e) => {
+                              form.setValue(
+                                "transcriptionService",
+                                e ? "elevenlabs" : "openai"
+                              );
+                            }}
+                            id="form-transcription-service"
+                          />
+                          <FieldLabel htmlFor="form-transcription-service">
+                            Use ElevenLabs for transcription
+                          </FieldLabel>
+                        </div>
+                        <FieldDescription>
+                          ElevenLabs provides better transcription quality, but
+                          is more expensive.
+                        </FieldDescription>
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    )}
+                  />
+                </FieldGroup>
+              </FieldSet>
+              <FieldSeparator className="text-border-muted -mx-4" />
               <FieldSet>
                 <FieldLegend>API Keys</FieldLegend>
                 <FieldDescription>
@@ -122,6 +170,9 @@ function RouteComponent() {
                           aria-invalid={fieldState.invalid}
                           placeholder="sk-1234..."
                           autoComplete="off"
+                          disabled={
+                            form.watch("transcriptionService") === "openai"
+                          }
                         />
                         {fieldState.invalid && (
                           <FieldError errors={[fieldState.error]} />

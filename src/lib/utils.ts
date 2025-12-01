@@ -1,12 +1,13 @@
-import { documentDir } from "@tauri-apps/api/path";
+import { appDataDir, documentDir } from "@tauri-apps/api/path";
 import { save } from "@tauri-apps/plugin-dialog";
-import { create } from "@tauri-apps/plugin-fs";
+import { create, writeFile } from "@tauri-apps/plugin-fs";
 import { Store } from "@tauri-apps/plugin-stronghold";
 import { clsx, type ClassValue } from "clsx";
 import { format } from "date-fns";
 import { twMerge } from "tailwind-merge";
 import { encoding_for_model, type TiktokenModel } from "tiktoken";
 import { v7 as uuidv7 } from "uuid";
+import { Progress } from "~/components/audio-upload/atoms";
 import { initStronghold } from "~/lib/stronghold";
 
 let strongholdStorePromise: Promise<Store> | null = null;
@@ -134,4 +135,36 @@ export function generateFileName(session: PartialSession) {
       .replace("{currentTime}", format(new Date(), "HH-mm")) +
     (fileExtensionExists ? "" : ".md")
   );
+}
+
+export async function saveLogs(logs: Progress[], sessionId: string) {
+  const appPath = await appDataDir();
+  const logsPath = `${appPath}/sessions/${sessionId}/logs.json`;
+  const data = JSON.stringify(logs);
+  await writeFile(logsPath, new TextEncoder().encode(data));
+}
+
+export function formatDuration(duration: number) {
+  const hours = Math.floor(duration / 3600);
+  const minutes = Math.floor((duration % 3600) / 60);
+  const seconds = duration % 60;
+
+  if (hours > 0) {
+    return `${hours}h ${minutes}m ${seconds.toFixed(0)}s`;
+  }
+  if (minutes > 0) {
+    return `${minutes}m ${seconds.toFixed(0)}s`;
+  }
+  return `${seconds.toFixed(0)}s`;
+}
+
+export function formatFilePath(filePath?: string) {
+  if (!filePath) {
+    return "-";
+  }
+  return filePath.replace(/\\/g, "/");
+}
+
+export function copyToClipboard(text: string) {
+  navigator.clipboard.writeText(text);
 }
