@@ -5,7 +5,6 @@ import React, { useState } from "react";
 import { AudioUpload } from "~/components/audio-upload";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { DeleteContentDialog } from "~/routes/campaign/$campaignId/$sessionId/-components/delete-content-dialog";
 import { Info } from "~/routes/campaign/$campaignId/$sessionId/-components/info";
 import { SessionContent } from "~/routes/campaign/$campaignId/$sessionId/-components/session-content";
