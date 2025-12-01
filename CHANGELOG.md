@@ -1,3 +1,11 @@
+# [1.2.0](https://github.com/jobiewong/loremonger/compare/v1.1.0...v1.2.0) (2025-12-01)
+
+
+### Features
+
+* add openai audio transcription functionality and UI components ([bbff592](https://github.com/jobiewong/loremonger/commit/bbff5927e97feb564d93b0eb15ac05e0b6f4c0f0))
+* enhance audio upload and session management features ([226089d](https://github.com/jobiewong/loremonger/commit/226089d68c1591886839485c92927f181e7131e8))
+
 # [1.1.0](https://github.com/jobiewong/loremonger/compare/v1.0.2...v1.1.0) (2025-11-25)
 
 
