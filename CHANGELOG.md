@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/jobiewong/loremonger/compare/v1.2.0...v1.3.0) (2026-02-10)
+
+
+### Features
+
+* add schema for campaign vaults + default providers ([1069991](https://github.com/jobiewong/loremonger/commit/1069991c042ef6fb7ed91ef75dd0e1b455f51dd3))
+
 # [1.2.0](https://github.com/jobiewong/loremonger/compare/v1.1.0...v1.2.0) (2025-12-01)
 
 
