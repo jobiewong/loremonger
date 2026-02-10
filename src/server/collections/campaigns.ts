@@ -16,6 +16,7 @@ const campaignsCollection = createCollection(
         with: {
           players: true,
           sessions: true,
+          vault: true,
         },
       });
     },

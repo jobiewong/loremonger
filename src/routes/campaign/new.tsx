@@ -82,10 +82,12 @@ function RouteComponent() {
         : (values.outputDirectory ?? null),
       namingConvention:
         values.namingConvention ?? "{currentDate}-{currentTime}_notes.md",
+      customSystemPrompt: null,
       createdAt: date,
       updatedAt: date,
       players: [],
       sessions: [],
+      vault: null,
     });
 
     for (const player of partyMembers) {
